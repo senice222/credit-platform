@@ -1,0 +1,65 @@
+.firstBlock {
+    h2 {
+        font-weight: 500 !important;
+        color :#344054 ;
+        font-size: 14px;
+        span {
+            color: #7F56D9;
+        }
+    }
+    textarea {
+        margin-top: 4px;
+        border: 1px solid #D0D5DD;
+        padding: 14px;
+        font-size: 16px;
+        font-weight: 400;
+        outline: none;
+        width: 100%;
+        height: 150px;
+        resize: none;
+        border-radius: 8px;
+
+    }
+    .finalBtn {
+        width: 100%;
+        cursor: pointer;
+        display: flex;
+        border: 0;
+        background-color: #7F56D9;
+        border-radius: 8px;
+        justify-content: center;
+        align-items: center;
+        height: 48px;
+        margin-top: 25px;
+        font-size: 16px;
+        font-weight: 600;
+        color: #FFFFFF;
+        svg {
+            margin-right: 7px;
+        }
+    }
+}
+.btns {
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+    margin-top: 30px;
+    button {
+        height: 44px;
+        width: 49%;
+        border-radius: 8px;
+        font-size: 16px;
+        font-weight: 600;
+        border: 0;
+        cursor: pointer;
+    }
+    .whiteBtn {
+        border: 1px solid #D0D5DD;
+        background-color: transparent;
+        color: #344054;
+    }
+    .blueBtn {
+        background-color: #D92D20;
+        color: #FFFFFF;
+    }
+}

@@ -1,0 +1,60 @@
+@import url("https://fonts.googleapis.com/css2?family=Inter:wght@400;700&display=swap");
+body {
+    overflow-x: hidden;
+    background: #fafafa;
+}
+* {
+    padding: 0;
+    margin: 0;
+    box-sizing: border-box;
+    font-family: "Inter", sans-serif;
+}
+.ant-picker {
+    cursor: pointer;
+    border-image-source: linear-gradient(180deg, rgba(255, 255, 255, 0.12) 0%, rgba(255, 255, 255, 0) 100%);
+    box-shadow: 0px 1px 2px 0px #0A0D120D;
+    box-shadow: 0px -2px 0px 0px #0a0d120d inset;
+    box-shadow: 0px 0px 0px 1px #0a0d122e inset;
+    background: #079455 !important;
+    width: 155px !important;
+    .ant-picker-input {
+        cursor: pointer;
+        input::placeholder {
+            color: #ffffff;
+            font-weight: 600;
+            font-size: 14px;
+        }
+        input {
+            cursor: pointer;
+            color: #ffffff;
+            font-weight: 600;
+            font-size: 14px;
+        }
+        path {
+            fill: white;
+        }
+    }
+}
+.ant-select-selection-item {
+    color: #667085;
+}
+.ant-select {
+    margin-right: 20px;
+}
+.css-3dzjca-MuiPaper-root-MuiPopover-paper-MuiMenu-paper {
+    max-height: calc(100% - 350px) !important;
+}
+.ant-dropdown-menu-item:hover {
+    background-color: white !important;
+}
+.ant-dropdown-menu-item {
+    cursor: default !important;
+    background-color: white !important;
+}
+
+@media (max-width: 768px) {
+    .css-1869usk-MuiFormControl-root {
+        margin: 0px !important;
+        width: 48%;
+    }
+}
