@@ -7,7 +7,7 @@ import { Document } from '../../pages/DetailedApplication/Svgs';
 const HistoryLog = ({ data }) => {
   const renderDocuments = (documents) => {
     if (!documents || documents.length === 0) return null;
-    
+
     return (
       <div className={styles.fileList} style={{ marginLeft: "15px", marginTop: "10px" }}>
         {documents.map((fileUrl, fileIndex) => (
@@ -28,9 +28,11 @@ const HistoryLog = ({ data }) => {
         <div key={index} className={styles.right}>
           <div className={item.type ? styles.questionRight : ''}>
             {item.admin && (
-              <p style={{ marginLeft: "15px", marginTop: "10px", color: "#344054" }}>
-                {item.admin}
-              </p>
+              <div style={{width: "40%"}}>
+                <p style={{ marginTop: "10px", color: "#344054" }}>
+                  {item.admin}
+                </p>
+              </div>
             )}
             <div
               className={

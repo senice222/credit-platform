@@ -6,6 +6,7 @@ import ruRU from "antd/es/locale/ru_RU";
 import StatusDropdown from '../../pages/DetailedApplication/StatusDropdown/StatusDropdown';
 import { url } from '../../core/axios';
 import { Calendar } from '../../pages/DetailedApplication/Svgs';
+import JSZip from 'jszip';
 
 const ApplicationDetails = ({ data }) => {
     const navigate = useNavigate();
@@ -21,7 +22,7 @@ const ApplicationDetails = ({ data }) => {
 
     const renderFile = (file, description) => {
         if (!file) return null;
-        
+
         return (
             <tr>
                 <td>
@@ -36,7 +37,7 @@ const ApplicationDetails = ({ data }) => {
                 <td>
                     <a href={`${url}/uploads/${file}`} download className={styles.downloadButton}>
                         <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
-                            <path d="M17.5 12.5V13.5C17.5 14.9001 17.5 15.6002 17.2275 16.135C16.9878 16.6054 16.6054 16.9878 16.135 17.2275C15.6002 17.5 14.9001 17.5 13.5 17.5H6.5C5.09987 17.5 4.3998 17.5 3.86502 17.2275C3.39462 16.9878 3.01217 16.6054 2.77248 16.135C2.5 15.6002 2.5 14.9001 2.5 13.5V12.5M14.1667 8.33333L10 12.5M10 12.5L5.83333 8.33333M10 12.5V2.5" 
+                            <path d="M17.5 12.5V13.5C17.5 14.9001 17.5 15.6002 17.2275 16.135C16.9878 16.6054 16.6054 16.9878 16.135 17.2275C15.6002 17.5 14.9001 17.5 13.5 17.5H6.5C5.09987 17.5 4.3998 17.5 3.86502 17.2275C3.39462 16.9878 3.01217 16.6054 2.77248 16.135C2.5 15.6002 2.5 14.9001 2.5 13.5V12.5M14.1667 8.33333L10 12.5M10 12.5L5.83333 8.33333M10 12.5V2.5"
                                 stroke="#0B7D5F" strokeWidth="1.66667" strokeLinecap="round" strokeLinejoin="round" />
                         </svg>
                         Скачать
@@ -49,6 +50,43 @@ const ApplicationDetails = ({ data }) => {
     const renderFiles = (files, description) => {
         if (!files || !files.length) return null;
         return files.map(file => renderFile(file, description));
+    };
+
+    const downloadAllFiles = async () => {
+        try {
+            const zip = new JSZip();
+            const files = [
+                ...(data.actSverki ? [{ name: 'Акт сверки/' + data.actSverki, url: data.actSverki }] : []),
+                ...(data.fileAct ? [{ name: 'Акты/' + data.fileAct, url: data.fileAct }] : []),
+                ...(data.fileExplain ? [{ name: 'Пояснения/' + data.fileExplain, url: data.fileExplain }] : []),
+                ...(data.cart60file ? [{ name: 'Карточка 60/' + data.cart60file, url: data.cart60file }] : []),
+                ...(data.allDocuments?.map(file => ({ name: 'Все документы/' + file, url: file })) || []),
+                ...(data.previousDocuments?.map(file => ({ name: 'Предыдущие документы/' + file, url: file })) || [])
+            ];
+
+            // Загружаем все файлы
+            const fetchPromises = files.map(async file => {
+                const response = await fetch(`${url}/uploads/${file.url}`);
+                const blob = await response.blob();
+                zip.file(file.name, blob);
+            });
+
+            await Promise.all(fetchPromises);
+
+            // Генерируем и скачиваем zip файл
+            const content = await zip.generateAsync({ type: 'blob' });
+            const downloadUrl = window.URL.createObjectURL(content);
+            const link = document.createElement('a');
+            link.href = downloadUrl;
+            link.download = `files_${data.inn || 'archive'}.zip`;
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            window.URL.revokeObjectURL(downloadUrl);
+        } catch (error) {
+            console.error('Ошибка при скачивании файлов:', error);
+            // Здесь можно добавить уведомление пользователю об ошибке
+        }
     };
 
     return (
@@ -153,9 +191,21 @@ const ApplicationDetails = ({ data }) => {
                             <option value="jpg">JPG</option>
                             <option value="docx">DOCX</option>
                         </select>
-                        <button className={styles.downloadAll}>
-                            <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                <path d="M17.5 12.5V13.5C17.5 14.9001 17.5 15.6002 17.2275 16.135C16.9878 16.6054 16.6054 16.9878 16.135 17.2275C15.6002 17.5 14.9001 17.5 13.5 17.5H6.5C5.09987 17.5 4.3998 17.5 3.86502 17.2275C3.39462 16.9878 3.01217 16.6054 2.77248 16.135C2.5 15.6002 2.5 14.9001 2.5 13.5V12.5M14.1667 8.33333L10 12.5M10 12.5L5.83333 8.33333M10 12.5V2.5" stroke="white" strokeWidth="1.66667" strokeLinecap="round" strokeLinejoin="round" />
+                        <button className={styles.downloadAll} onClick={downloadAllFiles}>
+                            <svg
+                                xmlns="http://www.w3.org/2000/svg"
+                                width={20}
+                                height={20}
+                                viewBox="0 0 20 20"
+                                fill="none"
+                            >
+                                <path
+                                    d="M6.66675 13.3333L10.0001 10M10.0001 10L13.3334 13.3333M10.0001 10V17.5M16.6667 13.9524C17.6847 13.1117 18.3334 11.8399 18.3334 10.4167C18.3334 7.88536 16.2814 5.83333 13.7501 5.83333C13.568 5.83333 13.3976 5.73833 13.3052 5.58145C12.2185 3.73736 10.2121 2.5 7.91675 2.5C4.46497 2.5 1.66675 5.29822 1.66675 8.75C1.66675 10.4718 2.36295 12.0309 3.48921 13.1613"
+                                    stroke="white"
+                                    strokeWidth="1.66667"
+                                    strokeLinecap="round"
+                                    strokeLinejoin="round"
+                                />
                             </svg>
                             Скачать все вместе
                         </button>

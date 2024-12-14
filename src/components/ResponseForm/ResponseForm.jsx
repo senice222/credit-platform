@@ -22,7 +22,7 @@ const ResponseForm = ({
         <div className={styles.report}>
             <div className={styles.sendAnswer}>
                 <div style={{ width: '30%' }}>
-                    <h2>Отправить ответ</h2>
+                    <h2 className={styles.h2}>Отправить ответ</h2>
                 </div>
                 <div className={styles.btns}>
                     <button onClick={() => setOpened(true)} className={styles.redBtn}>

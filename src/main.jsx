@@ -14,9 +14,9 @@ import FinishedApplications from "./components/FinishedApplications/FinishedAppl
 import Companies from "./pages/Companies/Companies.jsx";
 import AllApplications from "./pages/AllApplications/AllApplications.jsx";
 import DetailedCompany from "./pages/DetailedCompany/DetailedCompany.jsx";
-import Settings from "./pages/Settings/Settings.jsx";
 import ChooseModule from "./pages/ChooseModule/ChooseModule.jsx";
 import Samples from "./pages/Samples/Samples.jsx";
+import Settings from "./pages/Settings/Settings.jsx";
 
 const router = createBrowserRouter([
   {
@@ -26,6 +26,10 @@ const router = createBrowserRouter([
   {
     path: "/module",
     element: <ChooseModule />,
+  },
+  {
+    path: "/settings-access",
+    element: <Settings />,
   },
   {
     path: "/",

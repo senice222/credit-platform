@@ -41,7 +41,7 @@
             @media (max-width: 768px) {
                 padding: 16px;
                 gap: 12px;
-                
+
                 .infoItem {
                     min-width: 100%;
                     margin-bottom: 12px;
@@ -172,7 +172,7 @@
             .filesTable {
                 td {
                     padding: 8px 12px;
-                    
+
                     .fileInfo {
                         flex-direction: column;
                         align-items: flex-start;
@@ -195,7 +195,7 @@
                     .downloadButton {
                         padding: 6px 10px;
                         font-size: 13px;
-                        
+
                         svg {
                             width: 16px;
                             height: 16px;
@@ -265,21 +265,29 @@
                     align-items: center;
                     gap: 8px;
                     padding: 10px 16px;
-                    background: #0b7d5f;
-                    border: none;
+                    background: #079455;
+                    border: 2px solid;
+                    border-image-source: linear-gradient(
+                        180deg,
+                        rgba(255, 255, 255, 0.12) 0%,
+                        rgba(255, 255, 255, 0) 100%
+                    );
+                    box-shadow: 0px 1px 2px 0px #0A0D120D;
+                    box-shadow: 0px -2px 0px 0px #0A0D120D inset;
+                    box-shadow: 0px 0px 0px 1px #0A0D120D inset;
                     border-radius: 8px;
                     color: white;
                     font-weight: 600;
                     font-size: 14px;
                     cursor: pointer;
-
+                    transition: .1s;
                     @media (max-width: 768px) {
                         width: 100%;
                         justify-content: center;
                     }
 
                     &:hover {
-                        background: #096b51;
+                        background: #07894e;;
                     }
 
                     svg {
@@ -530,7 +538,7 @@
             border: 1px solid #75e0a7;
             background-color: #ffffff;
             color: #067647;
-            
+
             svg {
                 @media (max-width: 768px) {
                     width: 18px;
@@ -562,7 +570,7 @@
 
         div {
             width: 100%;
-            
+
             p {
                 font-size: 13px;
                 margin-bottom: 8px;
@@ -587,7 +595,7 @@
             margin-top: 16px;
             height: 44px;
             font-size: 14px;
-            
+
             div {
                 gap: 8px;
             }
@@ -601,21 +609,22 @@
 }
 
 // Обновляем стили таблиц для лучшей мобильной адаптации
-.answersTable, .filesTable {
+.answersTable,
+.filesTable {
     @media (max-width: 768px) {
         display: block;
         overflow-x: auto;
         white-space: nowrap;
         -webkit-overflow-scrolling: touch;
-        
+
         &::-webkit-scrollbar {
             height: 4px;
         }
-        
+
         &::-webkit-scrollbar-track {
             background: #f1f1f1;
         }
-        
+
         &::-webkit-scrollbar-thumb {
             background: #888;
             border-radius: 2px;
@@ -630,15 +639,15 @@
         padding: 0 16px;
         overflow-x: auto;
         -webkit-overflow-scrolling: touch;
-        
+
         &::-webkit-scrollbar {
             height: 4px;
         }
-        
+
         &::-webkit-scrollbar-track {
             background: #f1f1f1;
         }
-        
+
         &::-webkit-scrollbar-thumb {
             background: #888;
             border-radius: 2px;
@@ -672,7 +681,7 @@
     height: 40px;
     min-width: 155px;
     border-radius: 8px;
-    
+
     :global {
         .ant-picker-input > input {
             font-size: 14px;

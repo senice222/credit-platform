@@ -3,7 +3,6 @@ import PathComponent from '../../components/PathComponent/PathComponent'
 import AlertBox from '../../components/AlertBox/AlertBox'
 import TopActions from '../../components/TopActions/TopActions'
 import ApplicationDetails from '../../components/ApplicationDetails/ApplicationDetails'
-import moment from 'moment'
 import useSWR, { useSWRConfig } from 'swr'
 import { notification } from 'antd'
 import $api, { fetcher, url } from '../../core/axios'
@@ -65,24 +64,6 @@ const DetailedApplication = () => {
         message: "Ошибка при отправке заявки",
         description: e.message,
       });
-    }
-  };
-
-  const dateOnChange = async (date, id, _id) => {
-    try {
-      await mutate(`${url}/application/getAll`, fetcher(`${url}/application/set-date/${id}`, {
-        method: 'POST',
-        body: JSON.stringify({
-          _id,
-          date: date.toISOString(),
-        }),
-      }))
-      notification.success({
-        message: "Дата ответа успешно установлена",
-        duration: 2,
-      })
-    } catch (e) {
-      console.log(e)
     }
   };
 

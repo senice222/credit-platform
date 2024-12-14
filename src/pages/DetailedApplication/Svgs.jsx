@@ -43,7 +43,7 @@ export const Alert = () => {
     </svg>
   );
 };
-export const ArrowLink = ({style}) => {
+export const ArrowLink = ({ style }) => {
   return (
     <svg
       xmlns="http://www.w3.org/2000/svg"
@@ -83,7 +83,7 @@ export const Pencil = () => {
     </svg>
   );
 };
-export const CrossReport = () => {
+export const CrossReport = ({ style }) => {
   return (
     <svg
       xmlns="http://www.w3.org/2000/svg"
@@ -91,8 +91,10 @@ export const CrossReport = () => {
       height={20}
       viewBox="0 0 21 20"
       fill="none"
+      style={style}
     >
       <path
+        style={style}
         d="M15.5 5L5.5 15M5.5 5L15.5 15"
         stroke="white"
         strokeWidth="1.66667"

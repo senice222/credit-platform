@@ -1,7 +1,7 @@
 .topContainer {
     width: 100%;
     display: flex;
-    border-bottom: 1px solid #E9EAEB;
+    border-bottom: 1px solid #e9eaeb;
     padding-bottom: 20px;
     align-items: center;
     justify-content: space-between;
@@ -29,12 +29,12 @@
 
 .infoContainer {
     padding-bottom: 20px;
-    border-bottom: 1px solid #E9EAEB;
+    border-bottom: 1px solid #e9eaeb;
     h2 {
         margin-top: 32px;
         font-size: 18px;
         font-weight: 600;
-        color: #181D27;
+        color: #181d27;
     }
 }
 
@@ -44,7 +44,7 @@
     overflow-y: auto;
     scrollbar-width: thin;
     scrollbar-color: #888 #f1f1f1;
-    
+
     .subtitle {
         margin-top: 7px;
     }
@@ -137,8 +137,15 @@
 }
 .sendAnswer {
     display: flex;
+    margin-top: 32px;
     align-items: center;
     // justify-content: space-between;
+    .h2 {
+        font-size: 18px;
+        color: #181D27;
+        font-weight: 600;
+        line-height: 28px;
+    }
 }
 @media (max-width: 768px) {
     .sendAnswer {
@@ -242,7 +249,7 @@
     .finalBtn {
         width: 100%;
         cursor: pointer;
-        
+
         border: 0;
         border: 2px solid;
 
@@ -358,12 +365,9 @@
             margin-top: 5px;
             margin-bottom: 5px;
         }
-        
     }
-    
 }
 .logs {
-    
     .log {
         padding: 5px;
         background-color: #f9fafb;
@@ -384,16 +388,16 @@
 .right {
     display: flex;
     flex-direction: column;
-    
+
     .questionRight {
         display: flex;
         flex-direction: column;
-        justify-content: flex-end;
+        align-items: flex-end;
     }
 }
 .document {
     background-color: #ffffff;
-    border: 1px solid #D0D5DD;
+    border: 1px solid #d0d5dd;
     align-items: center;
     display: flex;
     width: 56%;
@@ -420,7 +424,7 @@
 .hr {
     width: 100%;
     height: 1px;
-    background-color: #E9EAEB;
+    background-color: #e9eaeb;
     margin-top: 20px;
     margin-bottom: 32px;
 }
@@ -435,7 +439,7 @@
     background-color: #079455;
     padding: 10px;
     margin-left: 15px;
-    width: 95%;
+    width: 40%;
     // height: 44px;
     border-radius: 8px 0px 8px 8px;
     color: white;

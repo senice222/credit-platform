@@ -34,6 +34,7 @@ const ChooseModule = () => {
     if (admin.loading) {
         return <Loader/>;
     }
+
     return (
         <div className={styles.wrapper}>
             <h1 className={styles.title}>Выберите модуль</h1>
@@ -49,14 +50,14 @@ const ChooseModule = () => {
                             <UserProfile/>
                         </div>
                         <div className={styles.userDetails}>
-                            <div>ivanova2132</div>
-                            <div className={styles.role}>Супер-администратор</div>
+                            <div>{admin.data.login}</div>
+                            <div className={styles.role}>{admin.data.superAdmin ? "Супер-администратор" : "Администратор"}</div>
                         </div>
                         <div style={{cursor: "pointer"}}>
                             <Logout />
                         </div>
                     </div>
-                    <button className={styles.settings}>
+                    <button className={styles.settings} onClick={() => navigate("/settings-access")}>
                         <Settings />
                         Настройки доступа
                     </button>

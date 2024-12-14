@@ -88,8 +88,8 @@ const Companies = () => {
                                                 xmlns="http://www.w3.org/2000/svg"
                                             >
                                                 <path
+                                                    style={{ stroke: "#067647" }}
                                                     d="M4.16675 10H15.8334M15.8334 10L10.0001 4.16669M15.8334 10L10.0001 15.8334"
-                                                    stroke="white"
                                                     strokeWidth="1.66667"
                                                     strokeLinecap="round"
                                                     strokeLinejoin="round"
