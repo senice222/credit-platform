@@ -4,13 +4,16 @@ import axios from '../../core/axios'
 const initialState = {
     loading: true,
     data: null,
-    error: null
+    error: null,
+    // transferKey: null
 }
 export const fetchAuth = createAsyncThunk('user/fetchAdminData', async (params) => {
     try {
         const {data} = await axios.post('admin/login', params)
         localStorage.setItem("token", data.token)
-        return data.admin
+        // const transferKey = await axios.post('admin/generateTransferKey', {adminId: data.admin._id})
+        // localStorage.setItem("transferKey", transferKey.data.transferKey)
+        return {admin: data.admin}
     } catch (e) {
         return e.response.data.message
     }
@@ -34,12 +37,13 @@ export const userSlice = createSlice({
             state.loading = true
         })
         builder.addCase(fetchAuth.fulfilled, (state, action) => {
-            if (!action.payload.login) {
+            if (!action.payload?.admin) {
                 state.data = null
                 state.error = 'Errored'
                 state.loading = false
             } else {
-                state.data = action.payload
+                state.data = action.payload.admin
+                // state.transferKey = action.payload.transferKey
                 state.loading = false
                 state.error = null
             }

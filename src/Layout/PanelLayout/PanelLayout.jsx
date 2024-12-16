@@ -26,7 +26,7 @@ const PanelLayout = () => {
     }
   }, [admin]);
   useAccessControl(admin)
-
+  // console.log(admin, 225)
   if (admin.loading) {
     return <Loader />;
   }

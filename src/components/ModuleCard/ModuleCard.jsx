@@ -1,8 +1,8 @@
 import styles from './ModuleCard.module.scss'
 
-const ModuleCard = ({ icon, title, url }) => {
+const ModuleCard = ({ icon, title, onClick }) => {
     return (
-        <div className={styles.card} onClick={() => window.location.replace(url)}>
+        <div className={styles.card} onClick={onClick}>
             <div className={styles.icon}>{icon}</div>
             <div className={styles.title}>{title}</div>
         </div>

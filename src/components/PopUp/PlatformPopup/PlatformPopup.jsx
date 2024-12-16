@@ -2,11 +2,14 @@ import {useState} from 'react';
 import styles from './PlatformPopup.module.scss';
 import {ActsFolder, CreditFolder, RequirementsFolder} from "../../Modal/Svgs.jsx";
 import {ChevronIcon} from "../../Svgs/Svgs.jsx";
-
+import { ActsUrl, requirementsUrl } from '../../../urls.jsx';
+import { useSelector } from 'react-redux';
+import axios from '../../../core/axios.js'
 function PlatformPopup() {
     const [isOpen, setIsOpen] = useState(false);
     const [isAnimating, setIsAnimating] = useState(false);
     const [activeModule, setActiveModule] = useState('Кредиторка');
+    const admin = useSelector((state) => state.admin);
 
     const openMenu = () => {
         setIsAnimating(false);
@@ -20,9 +23,18 @@ function PlatformPopup() {
 
     const handleModuleChange = (module) => {
         setActiveModule(module);
+        if (module === 'Требования') {
+            handleChooseModule(requirementsUrl)
+        } else if (module === 'Акты') {
+            handleChooseModule(ActsUrl)
+        }
         closeMenu();
     };
 
+    const handleChooseModule = async (url) => {
+        const {data} = await axios.post('admin/generateTransferKey', {adminId: admin.data._id})
+        window.location.href = `${url}/login/${data.transferKey}`
+    }
     return (
         <div className={styles.popupContainer}>
             <div className={styles.platformDiv} onClick={() => (isOpen ? closeMenu() : openMenu())}>

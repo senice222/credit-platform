@@ -6,6 +6,8 @@ import {fetchAuthMe} from "../../store/slices/Admin.slice";
 import Loader from "../../components/Loader/Loader";
 import useAccessControl from "../../hooks/useAccessControl";
 import ModuleCard from "../../components/ModuleCard/ModuleCard.jsx";
+import axios from '../../core/axios.js'
+import { ActsUrl, requirementsUrl } from "../../urls.jsx";
 import {
     ActsFolder,
     CreditFolder,
@@ -19,7 +21,7 @@ const ChooseModule = () => {
     const dispatch = useDispatch();
     const admin = useSelector((state) => state.admin);
     const navigate = useNavigate();
-
+    console.log(admin)
     useEffect(() => {
         dispatch(fetchAuthMe());
     }, []);
@@ -31,18 +33,26 @@ const ChooseModule = () => {
     }, [admin]);
     useAccessControl(admin)
 
+    const handleChooseModule = async (url) => {
+        const {data} = await axios.post('admin/generateTransferKey', {adminId: admin.data._id})
+        window.location.href = `${url}/login/${data.transferKey}`
+    }
+
     if (admin.loading) {
         return <Loader/>;
     }
-
+    if (!admin.data) {
+        return <Navigate to="/login"/>
+    }
+    // https://orders.consultantnlgpanel.ru
     return (
         <div className={styles.wrapper}>
             <h1 className={styles.title}>Выберите модуль</h1>
             <div className={styles.modulesWrapp}>
                 <div className={styles.modules}>
-                    <ModuleCard icon={<ActsFolder/>} url={"https://consultantnlgpanel.ru/login"} title="Акты"/>
-                    <ModuleCard icon={<RequirementsFolder/>} url={"https://orders.consultantnlgpanel.ru/login"} title="Требования"/>
-                    <ModuleCard icon={<CreditFolder/>} url={"/"} title="Кредиторка"/>
+                    <ModuleCard icon={<ActsFolder/>} onClick={() => handleChooseModule(ActsUrl)} title="Акты"/>
+                    <ModuleCard icon={<RequirementsFolder/>} onClick={() => handleChooseModule(requirementsUrl)} title="Требования"/>
+                    <ModuleCard icon={<CreditFolder/>} onClick={() => navigate("/")} title="Кредиторка"/>
                 </div>
                 <div className={styles.profile}>
                     <div className={styles.userInfo}>
