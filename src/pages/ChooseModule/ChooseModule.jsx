@@ -6,6 +6,7 @@ import {fetchAuthMe} from "../../store/slices/Admin.slice";
 import Loader from "../../components/Loader/Loader";
 import useAccessControl from "../../hooks/useAccessControl";
 import ModuleCard from "../../components/ModuleCard/ModuleCard.jsx";
+import { logout } from "../../store/slices/Admin.slice";
 import axios from '../../core/axios.js'
 import { ActsUrl, requirementsUrl } from "../../urls.jsx";
 import {
@@ -21,7 +22,6 @@ const ChooseModule = () => {
     const dispatch = useDispatch();
     const admin = useSelector((state) => state.admin);
     const navigate = useNavigate();
-    console.log(admin)
     useEffect(() => {
         dispatch(fetchAuthMe());
     }, []);
@@ -63,7 +63,10 @@ const ChooseModule = () => {
                             <div>{admin.data.login}</div>
                             <div className={styles.role}>{admin.data.superAdmin ? "Супер-администратор" : "Администратор"}</div>
                         </div>
-                        <div style={{cursor: "pointer"}}>
+                        <div onClick={() => {
+                            dispatch(logout())
+                            navigate("/login")
+                        }} style={{cursor: "pointer"}}>
                             <Logout />
                         </div>
                     </div>
