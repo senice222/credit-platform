@@ -19,15 +19,26 @@ const FinishedApplications = () => {
     return current && current < moment().startOf('day');
   };
   const filteredData = Array.isArray(data) ? (
-    data.filter((application) => {
-      const statusMatch = application.status === "Рассмотрена" || application.status === "Отклонена";
-      const searchTermLower = searchTerm.toLowerCase();
-      const normalIdMatch = application.normalId?.toString().includes(searchTermLower);
-      const innMatch = application.inn?.toLowerCase().includes(searchTermLower);
-      const companyNameMatch = application.name?.toLowerCase().includes(searchTermLower);
+    data
+      .filter((application) => {
+        const statusMatch = application.status === "Рассмотрена" || application.status === "Отклонена";
+        const searchTermLower = searchTerm.toLowerCase();
+        const normalIdMatch = application.normalId?.toString().includes(searchTermLower);
+        const innMatch = application.inn?.toLowerCase().includes(searchTermLower);
+        const companyNameMatch = application.name?.toLowerCase().includes(searchTermLower);
 
-      return statusMatch && (normalIdMatch || innMatch || companyNameMatch);
-    })) : [];
+        return statusMatch && (normalIdMatch || innMatch || companyNameMatch);
+      })
+      // Добавляем сортировку
+      .sort((a, b) => {
+        // Сначала заявки со статусом "Создана"
+        if (a.status === 'Создана' && b.status !== 'Создана') return -1;
+        if (b.status === 'Создана' && a.status !== 'Создана') return 1;
+        
+        // Затем по дате создания (новые сверху)
+        return new Date(b.createdAt) - new Date(a.createdAt);
+      })
+  ) : [];
 
   const dateOnChange = (date, id, _id) => {
     try {

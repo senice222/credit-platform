@@ -16,7 +16,7 @@ const CancelModal = ({ id, productId, isOpened, setOpened }) => {
       body: JSON.stringify({
         _id: productId,
         comments,
-        status: "На уточнение"
+        status: "Отклонена"
       }),
     }))
     notification.success({

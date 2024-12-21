@@ -51,10 +51,10 @@ const router = createBrowserRouter([
         path: "/companies",
         element: <Companies />,
       },
-      {
-        path: "/settings",
-        element: <Samples />,
-      },
+      // {
+      //   path: "/settings",
+      //   element: <Samples />,
+      // },
       {
         path: "/companies/:inn",
         element: <DetailedCompany />,

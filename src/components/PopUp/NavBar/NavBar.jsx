@@ -87,7 +87,7 @@ const NavBar = ({ isActive, setActive }) => {
           </div>
         </div>
         <div className={styles.settings}>
-          {admin.superAdmin && <div
+          {/* {admin.superAdmin && <div
             className={styles.itemSettings}
             onClick={() => {
               navigate("/settings")
@@ -96,7 +96,7 @@ const NavBar = ({ isActive, setActive }) => {
           >
             <img src={settings} alt={"/"} />
             <p className={styles.settingsText}>Настройки</p>
-          </div>}
+          </div>} */}
 
           <div className={styles.admin}>
             <div className={styles.circle}>
