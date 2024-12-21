@@ -40,7 +40,7 @@ const ApplicationDetails = ({ data }) => {
             <tr>
                 <td>
                     <div className={styles.fileInfo}>
-                        <div className={styles.fileIcon} data-type="FILE">FILE</div>
+                        <div className={styles.fileIcon} data-type="FILE">{file}</div>
                         <div>
                             <div className={styles.fileName}>{file}</div>
                         </div>
