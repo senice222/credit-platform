@@ -48,7 +48,7 @@ function PlatformPopup() {
                 <ChevronIcon/>
             </div>
             {(isOpen || isAnimating) && (
-                <div className={`${styles.popupMenu} ${isAnimating ? styles.closing : ''}`}>
+                <div className={`${styles.popupMenu} ${isAnimating ? styles.closing : ''}  ${isOpen ? styles.open : ''}`}>
                     {admin.data.modulesAccess.includes('Акты') || admin.data.superAdmin && <div
                         className={`${styles.popupMenuItem} ${activeModule === 'Акты' ? styles.active : ''}`}
                         onClick={() => handleModuleChange('Акты')}
