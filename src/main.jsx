@@ -20,6 +20,10 @@ import Settings from "./pages/Settings/Settings.jsx";
 
 const router = createBrowserRouter([
   {
+    path: "/notAllowed",
+    element: <NotAllowed />,
+  },
+  {
     path: "/login",
     element: <Login />,
   },
@@ -63,10 +67,7 @@ const router = createBrowserRouter([
         path: "/application/:id",
         element: <DetailedApplication />,
       },
-      {
-        path: "/notAllowed",
-        element: <NotAllowed />,
-      },
+      
     ],
   },
 ]);

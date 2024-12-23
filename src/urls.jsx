@@ -1,2 +1,2 @@
-export const ActsUrl = 'http://localhost:5175' 
-export const requirementsUrl = 'http://localhost:5174'
+export const ActsUrl = 'https://consultantnlgpanel.ru' 
+export const requirementsUrl = 'https://orders.consultantnlgpanel.ru'

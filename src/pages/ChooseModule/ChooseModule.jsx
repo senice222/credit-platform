@@ -50,9 +50,27 @@ const ChooseModule = () => {
             <h1 className={styles.title}>Выберите модуль</h1>
             <div className={styles.modulesWrapp}>
                 <div className={styles.modules}>
-                    <ModuleCard icon={<ActsFolder/>} onClick={() => handleChooseModule(ActsUrl)} title="Акты"/>
-                    <ModuleCard icon={<RequirementsFolder/>} onClick={() => handleChooseModule(requirementsUrl)} title="Требования"/>
-                    <ModuleCard icon={<CreditFolder/>} onClick={() => navigate("/")} title="Кредиторка"/>
+                    {(admin.data.superAdmin || admin.data.modulesAccess?.includes("Акты")) && (
+                        <ModuleCard 
+                            icon={<ActsFolder/>} 
+                            onClick={() => handleChooseModule(ActsUrl)} 
+                            title="Акты"
+                        />
+                    )}
+                    {(admin.data.superAdmin || admin.data.modulesAccess?.includes("Требования")) && (
+                        <ModuleCard 
+                            icon={<RequirementsFolder/>} 
+                            onClick={() => handleChooseModule(requirementsUrl)} 
+                            title="Требования"
+                        />
+                    )}
+                    {(admin.data.superAdmin || admin.data.modulesAccess?.includes("Кредиторка")) && (
+                        <ModuleCard 
+                            icon={<CreditFolder/>} 
+                            onClick={() => navigate("/")} 
+                            title="Кредиторка"
+                        />
+                    )}
                 </div>
                 <div className={styles.profile}>
                     <div className={styles.userInfo}>
@@ -70,10 +88,12 @@ const ChooseModule = () => {
                             <Logout />
                         </div>
                     </div>
-                    <button className={styles.settings} onClick={() => navigate("/settings-access")}>
-                        <Settings />
-                        Настройки доступа
-                    </button>
+                    {admin.data.superAdmin && (
+                        <button className={styles.settings} onClick={() => navigate("/settings-access")}>
+                            <Settings />
+                            Настройки доступа
+                        </button>
+                    )}
                 </div>
             </div>
         </div>

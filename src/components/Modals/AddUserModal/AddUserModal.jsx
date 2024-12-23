@@ -13,6 +13,7 @@ const AddUserModal = ({ isActive, setActive, admin }) => {
     const [username, setUsername] = useState("");
     const [password, setPassword] = useState("");
     const [comment, setComment] = useState("");
+    const [modulesAccess, setModulesAccess] = useState([]);
     const [mail, setMail] = useState(false);
     const [application, setApplication] = useState(false);
     const [company, setCompany] = useState(false);
@@ -21,7 +22,10 @@ const AddUserModal = ({ isActive, setActive, admin }) => {
     const { mutate } = useSWRConfig()
     const [isSuper, setSuper] = useState(false)
     const login = useSelector(state => state.admin.data.login)
-
+    const [acts, setActs] = useState(false);
+    const [requirements, setRequirements] = useState(false);
+    const [creditors, setCreditors] = useState(false);
+    console.log(admin)
     useEffect(() => {
         if (admin === null) {
             setFullName('')
@@ -34,6 +38,9 @@ const AddUserModal = ({ isActive, setActive, admin }) => {
             setRoles(false)
             setBlocked(false)
             setSuper(false)
+            setActs(false)
+            setRequirements(false)
+            setCreditors(false)
         } else if (admin) {
             setFullName(admin.fio)
             setUsername(admin.login)
@@ -44,22 +51,31 @@ const AddUserModal = ({ isActive, setActive, admin }) => {
             setBlocked(true)
             setPassword(admin.passwordHash)
             setSuper(admin.superAdmin)
+            setActs(admin.modulesAccess?.includes("Акты"))
+            setRequirements(admin.modulesAccess?.includes("Требования"))
+            setCreditors(admin.modulesAccess?.includes("Кредиторка"))
         }
     }, [admin])
 
     const handleCreate = async () => {
         if (!admin) {
             const bodyParams = {
-                login: username, password: password, comment, access: [], superAdmin: isSuper
+                login: username, password: password, comment, access: [], superAdmin: isSuper, modulesAccess: []
             }
             if (isSuper) {
                 bodyParams.access.push("Почта");
                 bodyParams.access.push("Заявки");
                 bodyParams.access.push("Компании");
+                bodyParams.modulesAccess.push("Акты");
+                bodyParams.modulesAccess.push("Требования");
+                bodyParams.modulesAccess.push("Кредиторка");
             } else {
                 if (mail) bodyParams.access.push("Почта");
                 if (application) bodyParams.access.push("Заявки");
                 if (company) bodyParams.access.push("Компании");
+                if (acts) bodyParams.modulesAccess.push("Акты");
+                if (requirements) bodyParams.modulesAccess.push("Требования");
+                if (creditors) bodyParams.modulesAccess.push("Кредиторка");
             }
             await mutate(`${url}/admins`, fetcher(`${url}/admin/create`, {
                 method: "POST",
@@ -78,16 +94,22 @@ const AddUserModal = ({ isActive, setActive, admin }) => {
             setSuper(false)
         } else {
             const bodyParams = {
-                fio: fullName, login: username, comment, access: [], superAdmin: isSuper,
+                fio: fullName, login: username, comment, access: [], superAdmin: isSuper, modulesAccess: []
             }
             if (isSuper) {
                 bodyParams.access.push("Почта");
                 bodyParams.access.push("Заявки");
                 bodyParams.access.push("Компании");
+                bodyParams.modulesAccess.push("Акты");
+                bodyParams.modulesAccess.push("Требования");
+                bodyParams.modulesAccess.push("Кредиторка");
             } else {
                 if (mail) bodyParams.access.push("Почта");
                 if (application) bodyParams.access.push("Заявки");
                 if (company) bodyParams.access.push("Компании");
+                if (acts) bodyParams.modulesAccess.push("Акты");
+                if (requirements) bodyParams.modulesAccess.push("Требования");
+                if (creditors) bodyParams.modulesAccess.push("Кредиторка");
             }
 
             await mutate(`${url}/admins`, fetcher(`${url}/admin/${admin._id}`, {
@@ -149,6 +171,38 @@ const AddUserModal = ({ isActive, setActive, admin }) => {
                     />
                 </div>
                 <div className={s.textareaDiv}>
+                    {admin?.login !== login && !isSuper && (<h2>Доступ к модулям <span>*</span></h2>)}
+                    {!isSuper && <div className={s.checkBoxes}>
+                        <div 
+                            className={`${s.checkBoxBlock} ${acts ? s.active : ''}`} 
+                            onClick={() => setActs((value) => !value)}
+                        >
+                            <div className={s.topContainer}>
+                                <h5>Акты</h5>
+                                <CheckBox value={acts} />
+                            </div>
+                        </div>
+                        <div 
+                            className={`${s.checkBoxBlock} ${requirements ? s.active : ''}`} 
+                            onClick={() => setRequirements((value) => !value)}
+                        >
+                            <div className={s.topContainer}>
+                                <h5>Требования</h5>
+                                <CheckBox value={requirements} />
+                            </div>
+                        </div>
+                        <div 
+                            className={`${s.checkBoxBlock} ${creditors ? s.active : ''}`} 
+                            onClick={() => setCreditors((value) => !value)}
+                        >
+                            <div className={s.topContainer}>
+                                <h5>Кредиторка</h5>
+                                <CheckBox value={creditors} />
+                            </div>
+                        </div>
+                    </div>}
+                </div>
+                <div className={s.textareaDiv}>
                     {admin?.login !== login && (<h2>Доступ к разделам <span>*</span></h2>)}
                     {!isSuper && <div className={s.checkBoxes}>
                         <div className={`${s.checkBoxBlock} ${mail ? s.active : ''}`} onClick={() => setMail((value) => !value)}>
@@ -156,21 +210,18 @@ const AddUserModal = ({ isActive, setActive, admin }) => {
                                 <h5>Почта</h5>
                                 <CheckBox value={mail} />
                             </div>
-                            <p>Возможность ответа на заявки, выставление даты ответа</p>
                         </div>
                         <div className={`${s.checkBoxBlock} ${application ? s.active : ''}`} onClick={() => setApplication((value) => !value)}>
                             <div className={s.topContainer}>
                                 <h5>Заявки</h5>
                                 <CheckBox value={application} />
                             </div>
-                            <p>Просмотр заявок и ответов, выставление даты ответа</p>
                         </div>
                         <div className={`${s.checkBoxBlock} ${company ? s.active : ''}`} onClick={() => setCompany((value) => !value)}>
                             <div className={s.topContainer}>
                                 <h5>Компании</h5>
                                 <CheckBox value={company} />
                             </div>
-                            <p>Просмотр зарегистрированных компаний и заявок по ним</p>
                         </div>
                     </div>}
                     {
