@@ -1,47 +1,93 @@
 import { useNavigate } from 'react-router-dom'
 import styles from './ApplicationDetails.module.scss'
 import { ArrowLink } from '../../pages/DetailedApplication/Svgs'
-import { ConfigProvider, DatePicker, Tooltip } from "antd";
+import { ConfigProvider, DatePicker, notification, Tooltip } from "antd";
 import ruRU from "antd/es/locale/ru_RU";
 import StatusDropdown from '../../pages/DetailedApplication/StatusDropdown/StatusDropdown';
-import { url } from '../../core/axios';
+import { fetcher, url } from '../../core/axios';
 import { Calendar } from '../../pages/DetailedApplication/Svgs';
-import JSZip from 'jszip';
+import { useSWRConfig } from 'swr';
+import { useState } from 'react';
 
 const ApplicationDetails = ({ data }) => {
     const navigate = useNavigate();
-
+    const { mutate } = useSWRConfig();
     const disabledDate = (current) => {
         return current && current.valueOf() < Date.now();
     };
 
-    const dateOnChange = (date, owner, id) => {
-        // Здесь будет ваша логика обработки изменения даты
-        console.log(date, owner, id);
+    const dateOnChange = (date, id, _id) => {
+        try {
+            mutate(`${url}/application/getAll`, fetcher(`${url}/application/set-date/${id}`, {
+                method: 'POST',
+                body: JSON.stringify({
+                    _id,
+                    date: date.toISOString(),
+                }),
+            }))
+            notification.success({
+                message: "Дата ответа успешно установлена.",
+                duration: 2,
+                style: { fontFamily: "Inter" }
+            })
+        } catch (e) {
+            console.log(e)
+        }
+    };
+
+    const downloadFile = async (fileUrl, description) => {
+        try {
+            const response = await fetch(fileUrl);
+            const blob = await response.blob();
+            const url = window.URL.createObjectURL(blob);
+            const link = document.createElement('a');
+            link.href = url;
+            
+            // Получаем расширение из URL файла
+            const extension = fileUrl.split('.').pop();
+            // Формируем имя файла из description и расширения
+            link.download = `${description}.${extension}`;
+            
+            document.body.appendChild(link);
+            link.click();
+            link.remove();
+            window.URL.revokeObjectURL(url);
+        } catch (error) {
+            console.error('Error downloading file:', error);
+        }
     };
 
     const renderFile = (file, description) => {
         if (!file) return null;
 
+        // Handle case when file is an array
+        const fileUrl = Array.isArray(file) ? file[0] : file;
+        
+        // Extract filename from URL and get its extension
+        const filename = fileUrl?.split('@')[1];
+        const fileExt = filename?.split('.').pop()?.toUpperCase();
+
         return (
             <tr>
                 <td>
                     <div className={styles.fileInfo}>
-                        <div className={styles.fileIcon} data-type="FILE">FILE</div>
                         <div>
-                            <div className={styles.fileName}>{file}</div>
+                            <div className={styles.fileName}>{description}</div>
                         </div>
                     </div>
                 </td>
-                <td>{description}</td>
+                <td>{fileExt}</td>
                 <td>
-                    <a href={`${url}/uploads/${file}`} download className={styles.downloadButton}>
+                    <button 
+                        onClick={() => downloadFile(fileUrl, description)}
+                        className={styles.downloadButton}
+                    >
                         <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
                             <path d="M17.5 12.5V13.5C17.5 14.9001 17.5 15.6002 17.2275 16.135C16.9878 16.6054 16.6054 16.9878 16.135 17.2275C15.6002 17.5 14.9001 17.5 13.5 17.5H6.5C5.09987 17.5 4.3998 17.5 3.86502 17.2275C3.39462 16.9878 3.01217 16.6054 2.77248 16.135C2.5 15.6002 2.5 14.9001 2.5 13.5V12.5M14.1667 8.33333L10 12.5M10 12.5L5.83333 8.33333M10 12.5V2.5"
                                 stroke="#0B7D5F" strokeWidth="1.66667" strokeLinecap="round" strokeLinejoin="round" />
                         </svg>
                         Скачать
-                    </a>
+                    </button>
                 </td>
             </tr>
         );
@@ -54,38 +100,61 @@ const ApplicationDetails = ({ data }) => {
 
     const downloadAllFiles = async () => {
         try {
-            const zip = new JSZip();
             const files = [
-                ...(data.actSverki ? [{ name: 'Акт сверки/' + data.actSverki, url: data.actSverki }] : []),
-                ...(data.fileAct ? [{ name: 'Акты/' + data.fileAct, url: data.fileAct }] : []),
-                ...(data.fileExplain ? [{ name: 'Пояснения/' + data.fileExplain, url: data.fileExplain }] : []),
-                ...(data.cart60file ? [{ name: 'Карточка 60/' + data.cart60file, url: data.cart60file }] : []),
-                ...(data.allDocuments?.map(file => ({ name: 'Все документы/' + file, url: file })) || []),
-                ...(data.previousDocuments?.map(file => ({ name: 'Предыдущие документы/' + file, url: file })) || [])
+                ...(data.actSverki ? [{ url: data.actSverki }] : []),
+                ...(data.fileAct ? [{ url: data.fileAct }] : []),
+                ...(data.fileExplain ? [{ url: data.fileExplain }] : []),
+                ...(data.cart60file ? [{ url: data.cart60file }] : []),
+                ...(data.allDocuments?.map(file => ({ url: file })) || []),
+                ...(data.previousDocuments?.map(file => ({ url: file })) || [])
             ];
 
-            // Загружаем все файлы
-            const fetchPromises = files.map(async file => {
-                const response = await fetch(`${url}/uploads/${file.url}`);
-                const blob = await response.blob();
-                zip.file(file.name, blob);
+            // Скачиваем каждый файл отдельно
+            files.forEach(file => {
+                const link = document.createElement('a');
+                link.href = `/uploads/${file.url}`;
+                link.download = file.url; // Имя файла будет оригинальным
+                link.style.display = 'none';
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
             });
-
-            await Promise.all(fetchPromises);
-
-            // Генерируем и скачиваем zip файл
-            const content = await zip.generateAsync({ type: 'blob' });
-            const downloadUrl = window.URL.createObjectURL(content);
-            const link = document.createElement('a');
-            link.href = downloadUrl;
-            link.download = `files_${data.inn || 'archive'}.zip`;
-            document.body.appendChild(link);
-            link.click();
-            document.body.removeChild(link);
-            window.URL.revokeObjectURL(downloadUrl);
         } catch (error) {
             console.error('Ошибка при скачивании файлов:', error);
-            // Здесь можно добавить уведомление пользователю об ошибке
+        }
+    };
+
+    const [selectedFilter, setSelectedFilter] = useState("");
+
+    const handleFilterChange = (e) => {
+        setSelectedFilter(e.target.value);
+    };
+
+    const getFilteredFiles = () => {
+        if (!selectedFilter) return [
+            ...(data.actSverki ? [{ file: data.actSverki, description: 'Акт сверки' }] : []),
+            ...(data.fileAct ? [{ file: data.fileAct, description: 'Акт' }] : []),
+            ...(data.fileExplain ? [{ file: data.fileExplain, description: 'Пояснение' }] : []),
+            ...(data.cart60file ? [{ file: data.cart60file, description: 'Карточка 60 счета' }] : []),
+            ...(data.allDocuments?.map(file => ({ file, description: 'Все документы' })) || []),
+            ...(data.previousDocuments?.map(file => ({ file, description: 'Предыдущие документы' })) || [])
+        ];
+
+        switch (selectedFilter) {
+            case 'act':
+                return data.fileAct ? [{ file: data.fileAct, description: 'Акт' }] : [];
+            case 'cart60':
+                return data.cart60file ? [{ file: data.cart60file, description: 'Карточка 60 счета' }] : [];
+            case 'actSverki':
+                return data.actSverki ? [{ file: data.actSverki, description: 'Акт сверки' }] : [];
+            case 'explain':
+                return data.fileExplain ? [{ file: data.fileExplain, description: 'Пояснение' }] : [];
+            case 'allDocs':
+                return data.allDocuments?.map(file => ({ file, description: 'Все документы' })) || [];
+            case 'previousDocs':
+                return data.previousDocuments?.map(file => ({ file, description: 'Предыдущие документы' })) || [];
+            default:
+                return [];
         }
     };
 
@@ -157,24 +226,24 @@ const ApplicationDetails = ({ data }) => {
                             </thead>
                             <tbody>
                                 <tr>
-                                    <td>Формальная (реальная) сделка</td>
-                                    <td style={{ color: "#535862" }}>{data?.isFormalDeal ? 'Да' : 'Нет'}</td>
-                                </tr>
-                                <tr>
                                     <td>Наличие дополнительных соглашений</td>
                                     <td style={{ color: "#535862" }}>{data?.demandsOrganization ? 'Да' : 'Нет'}</td>
                                 </tr>
-                                <tr>
-                                    <td>Дата последнего акта сверки</td>
-                                    <td style={{ color: "#535862" }}>{data?.lastDateActSverki}</td>
-                                </tr>
+                                {
+                                    data?.lastDateActSverki && (
+                                        <tr>
+                                            <td>Дата последнго акта сверки</td>
+                                            <td style={{ color: "#535862" }}>{data?.lastDateActSverki}</td>
+                                        </tr>
+                                    )
+                                }
                                 <tr>
                                     <td>Период карточки 60 счета</td>
                                     <td style={{ color: "#535862" }}>{data?.cart60file && '15.02.23 - 12.04.24'}</td>
                                 </tr>
                                 <tr>
                                     <td>Ранее предъявлялись требования к этой организации?</td>
-                                    <td style={{ color: "#535862" }}>{data?.previousDocuments?.length > 0 ? 'Да' : 'ет'}</td>
+                                    <td style={{ color: "#535862" }}>{data?.previousDocuments?.length > 0 ? 'Да' : 'Нет'}</td>
                                 </tr>
                             </tbody>
                         </table>
@@ -185,11 +254,14 @@ const ApplicationDetails = ({ data }) => {
                 <div className={styles.filesHeader}>
                     <h2>Загруженные клиентом файлы</h2>
                     <div className={styles.actions}>
-                        <select className={styles.filterSelect}>
+                        <select className={styles.filterSelect} onChange={handleFilterChange}>
                             <option value="">Фильтр по типу</option>
-                            <option value="pdf">PDF</option>
-                            <option value="jpg">JPG</option>
-                            <option value="docx">DOCX</option>
+                            <option value="act">Акт</option>
+                            <option value="cart60">Карточка 60 счета</option>
+                            <option value="actSverki">Акт сверки</option>
+                            <option value="explain">Пояснение</option>
+                            <option value="allDocs">Все документы</option>
+                            <option value="previousDocs">Предыдущие документы</option>
                         </select>
                         <button className={styles.downloadAll} onClick={downloadAllFiles}>
                             <svg
@@ -221,12 +293,9 @@ const ApplicationDetails = ({ data }) => {
                             </tr>
                         </thead>
                         <tbody>
-                            {data.actSverki?.length > 0 && renderFile(data.actSverki, 'Акт сверки')}
-                            {data.fileAct?.length > 0 && renderFile(data.fileAct, 'Акт')}
-                            {data.fileExplain?.length > 0 && renderFile(data.fileExplain, 'Пояснение')}
-                            {data.cart60file?.length > 0 && renderFile(data.cart60file, 'Карточка 60 счета')}
-                            {data.allDocuments?.length > 0 && renderFiles(data.allDocuments, 'Все документы')}
-                            {data.previousDocuments?.length > 0 && renderFiles(data.previousDocuments, 'Предыдущие документы')}
+                            {getFilteredFiles().map(({ file, description }, index) => 
+                                renderFile(file, description)
+                            )}
                         </tbody>
                     </table>
                 </div>

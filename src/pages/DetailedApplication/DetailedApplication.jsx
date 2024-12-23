@@ -13,6 +13,7 @@ import { useSelector } from "react-redux";
 import ReportChanges from '../../components/ReportChanges/ReportChanges'
 import { Docs, Pdf } from './Svgs'
 import ClarificationModal from '../../components/Modals/ClarificationModal/ClarificationModal'
+import CancelModal from "../../components/Modals/CancelModal/CancelModal";
 
 const DetailedApplication = () => {
   const { id } = useParams();
@@ -67,6 +68,8 @@ const DetailedApplication = () => {
     }
   };
 
+
+
   const filesObj = {
     ".pdf": <Pdf />,
     ".docx": <Docs />,
@@ -77,6 +80,12 @@ const DetailedApplication = () => {
   return (
     <>
       <ClarificationModal data={data} isOpen={isCancel} setOpen={() => setCancel(false)} />
+      <CancelModal
+        id={data.owner}
+        productId={data._id}
+        isOpened={isOpened}
+        setOpened={() => setOpened(false)}
+      />
       <div className={styles.DetailedApplication}>
         <PathComponent
           first="Активные заявки"

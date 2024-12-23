@@ -87,7 +87,12 @@ const AllApplications = () => {
 
                 return statusMatch && companyMatch && searchMatch && yearMatch && monthMatch;
             })
-            .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
+            .sort((a, b) => {
+                if (a.status === 'Создана' && b.status !== 'Создана') return -1;
+                if (b.status === 'Создана' && a.status !== 'Создана') return 1;
+                
+                return new Date(b.createdAt) - new Date(a.createdAt);
+            })
     ) : [];
 
 
@@ -229,7 +234,9 @@ const AllApplications = () => {
                             <tr key={i} onClick={() => navigate(`/application/${application._id}`)}>
                                 <td >№{application.normalId}</td>
                                 <td >{application.name}<br /> <span>ИНН {application.inn}</span></td>
-                                <td className={style.flexEnd}><span className={statusStyles[application.status.trim()]}>{application.status}</span></td>
+                                <td className={style.flexEnd}>
+                                    <span className={statusStyles[application.status]}>{application.status}</span>
+                                </td>
                                 <td className={style.flexEnd}>
                                     <div>
                                         {

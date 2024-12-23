@@ -28,16 +28,21 @@ const ActiveApplications = () => {
   };
   const filteredData = Array.isArray(data) ? (
     data
-      .filter(application => application.status[0] !== 'Рассмотрена' && application.status[0] !== 'Отклонена')
+      .filter(application => application.status !== 'Рассмотрена' && application.status !== 'Отклонена')
       .filter((application) => {
-        console.log(application.status[0] === status)
-        const statusMatch = status ? application.status[0] === status : true
+        const statusMatch = status ? application.status === status : true
         const searchTermLower = searchTerm.toLowerCase()
         const nameMatch = application.name?.toLowerCase().includes(searchTermLower)
         const normalIdMatch = application.normalId?.toString().includes(searchTermLower)
         const innMatch = application.inn?.includes(searchTermLower)
 
         return statusMatch && (normalIdMatch || innMatch || nameMatch)
+      })
+      .sort((a, b) => {
+        if (a.status === 'Создана' && b.status !== 'Создана') return -1;
+        if (b.status === 'Создана' && a.status !== 'Создана') return 1;
+        
+        return new Date(b.createdAt) - new Date(a.createdAt);
       })
   ) : []
 

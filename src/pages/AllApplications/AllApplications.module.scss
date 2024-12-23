@@ -185,10 +185,10 @@
         border-radius: 12px;
         font-weight: 500;
     }
-    .blocked {
-        background-color: #fef3f2;
-        color: #b42318 !important;
-        border: 1px solid #fecdca !important;
+    .created {
+        background-color: #f4f3ff;
+        color: #5925dc !important;
+        border: 1px solid #d9d6fe !important;
         padding: 2px 8px;
         border-radius: 12px;
         font-weight: 500;
@@ -260,12 +260,4 @@
         display: block;
         text-align: center;
     }
-}
-.created {
-    background-color: #f4f3ff;
-    color: #5925dc !important;
-    border: 1px solid #d9d6fe !important;
-    padding: 2px 8px;
-    border-radius: 12px;
-    font-weight: 500;
 }
