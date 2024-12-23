@@ -1,11 +1,12 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Trash, Pencil } from "../../components/Svgs/Svgs";
 import style from "./Settings.module.scss";
 import useSWR, { useSWRConfig } from "swr";
 import { fetcher, url } from "../../core/axios";
 import SettingsModal from "../../components/Modals/AddUserModal/AddUserModal";
-import { useSelector } from "react-redux";
+import { useSelector, useDispatch } from "react-redux";
 import Loader from "../../components/Loader/Loader";
+import { fetchAuthMe } from "../../store/slices/Admin.slice";
 import { CrossReport } from "../DetailedApplication/Svgs";
 
 const Settings = () => {
@@ -15,6 +16,7 @@ const Settings = () => {
   const [searchInput, setSearchInput] = useState("");
   const admin = useSelector((state) => state.admin.data);
   const { mutate } = useSWRConfig();
+  const dispatch = useDispatch();
 
   const handleDelete = async (id) => {
     await mutate(
@@ -30,7 +32,9 @@ const Settings = () => {
     data.filter((item) =>
       item.login.toLowerCase().includes(searchInput.toLowerCase())
     );
-
+    useEffect(() => {
+        dispatch(fetchAuthMe());
+    }, [])
   if (!admin) return <Loader />;
 
   return (

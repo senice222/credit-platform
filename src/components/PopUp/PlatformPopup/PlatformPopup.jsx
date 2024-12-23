@@ -85,7 +85,10 @@ function PlatformPopup() {
                             <div className={styles.activeCircle} />
                         </div>
                     </div>}
-                
+                    <div className={styles.settings} onClick={() => navigate("/settings-access")}>
+                        <div className={styles.settingsIcon}>⚙️</div>
+                        <span>Настройки доступа</span>
+                    </div>
                 </div>
             )}
         </div>
