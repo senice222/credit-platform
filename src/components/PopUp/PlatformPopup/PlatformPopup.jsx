@@ -49,7 +49,7 @@ function PlatformPopup() {
             </div>
             {(isOpen || isAnimating) && (
                 <div className={`${styles.popupMenu} ${isAnimating ? styles.closing : ''}`}>
-                    <div
+                    {admin.data.modulesAccess.includes('Акты') || admin.data.superAdmin && <div
                         className={`${styles.popupMenuItem} ${activeModule === 'Акты' ? styles.active : ''}`}
                         onClick={() => handleModuleChange('Акты')}
                     >
@@ -60,8 +60,8 @@ function PlatformPopup() {
                         <div className={`${activeModule === 'Акты' ? styles.circle : styles.defaultCircle} `}>
                             <div className={styles.activeCircle} />
                         </div>
-                    </div>
-                    <div
+                    </div>}
+                    {admin.data.modulesAccess.includes('Требования') || admin.data.superAdmin && <div
                         className={`${styles.popupMenuItem} ${activeModule === 'Требования' ? styles.active : ''}`}
                         onClick={() => handleModuleChange('Требования')}
                     >
@@ -72,8 +72,8 @@ function PlatformPopup() {
                         <div className={`${activeModule === 'Требования' ? styles.circle : styles.defaultCircle} `}>
                             <div className={styles.activeCircle} />
                         </div>
-                    </div>
-                    <div
+                    </div>}
+                    {admin.data.modulesAccess.includes('Кредиторка') || admin.data.superAdmin && <div
                         className={`${styles.popupMenuItem} ${activeModule === 'Кредиторка' ? styles.active : ''}`}
                         onClick={() => handleModuleChange('Кредиторка')}
                     >
@@ -84,11 +84,8 @@ function PlatformPopup() {
                         <div className={`${activeModule === 'Кредиторка' ? styles.circle : styles.defaultCircle} `}>
                             <div className={styles.activeCircle} />
                         </div>
-                    </div>
-                    <div className={styles.settings} onClick={() => navigate("/settings-access")}>
-                        <div className={styles.settingsIcon}>⚙️</div>
-                        <span>Настройки доступа</span>
-                    </div>
+                    </div>}
+                
                 </div>
             )}
         </div>
