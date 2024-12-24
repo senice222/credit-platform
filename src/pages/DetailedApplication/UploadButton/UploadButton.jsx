@@ -20,6 +20,60 @@ const UploadButton = ({ uploads, setUploads }) => {
     });
   };
 
+  const uploadFile = async (file, index) => {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+
+      reader.onloadstart = () => {
+        setUploads((prevUploads) => {
+          const newUploads = [...prevUploads];
+          if (newUploads[index]) {
+            newUploads[index].progress = 0;
+          }
+          return newUploads;
+        });
+      };
+
+      reader.onprogress = (event) => {
+        if (event.lengthComputable) {
+          const progress = Math.round((event.loaded * 100) / event.total);
+          setUploads((prevUploads) => {
+            const newUploads = [...prevUploads];
+            if (newUploads[index]) {
+              newUploads[index].progress = progress;
+            }
+            return newUploads;
+          });
+        }
+      };
+
+      reader.onload = () => {
+        setUploads((prevUploads) => {
+          const newUploads = [...prevUploads];
+          if (newUploads[index]) {
+            newUploads[index].progress = 100;
+            newUploads[index].uploaded = true;
+          }
+          return newUploads;
+        });
+        resolve();
+      };
+
+      reader.onerror = () => {
+        setUploads((prevUploads) => {
+          const newUploads = [...prevUploads];
+          if (newUploads[index]) {
+            newUploads[index].error = true;
+          }
+          return newUploads;
+        });
+        reject(new Error('Ошибка чтения файла'));
+      };
+
+      reader.readAsDataURL(file);
+    });
+  };
+
   const handleFileUpload = (event) => {
     const files = event.target.files;
     if (files) {
@@ -27,36 +81,17 @@ const UploadButton = ({ uploads, setUploads }) => {
         file,
         progress: 0,
         uploaded: false,
-        timerId: null,
+        error: false
       }));
+      
       setUploads((prevUploads) => {
         const updatedUploads = [...prevUploads, ...newUploads];
-        newUploads.forEach((_, i) => simulateUpload(prevUploads.length + i));
+        newUploads.forEach((_, i) => {
+          uploadFile(files[i], prevUploads.length + i).catch(console.error);
+        });
         return updatedUploads;
       });
     }
-  };
-
-  const simulateUpload = (index) => {
-    const timerId = setInterval(() => {
-      setUploads((prevUploads) => {
-        const newUploads = [...prevUploads];
-        if (newUploads[index] && newUploads[index].progress < 100) {
-          newUploads[index].progress += 25;
-        } else if (newUploads[index]) {
-          newUploads[index].uploaded = true;
-          clearInterval(newUploads[index].timerId);
-        }
-        return newUploads;
-      });
-    }, 500);
-    setUploads((prevUploads) => {
-      const newUploads = [...prevUploads];
-      if (newUploads[index]) {
-        newUploads[index].timerId = timerId;
-      }
-      return newUploads;
-    });
   };
 
   const formatBytes = (bytes, decimals = 2) => {
@@ -129,10 +164,10 @@ const UploadButton = ({ uploads, setUploads }) => {
                 </div>
                 <div className={styles.progressBarWrapper}>
                   <div
-                    className={styles.progressBar}
+                    className={`${styles.progressBar} ${upload.error ? styles.errorBar : ''}`}
                     style={{ width: `${upload.progress}%` }}
                   />
-                  <p>{upload.progress}%</p>
+                  <p>{upload.error ? 'Ошибка загрузки' : `${upload.progress}%`}</p>
                 </div>
               </div>
             </div>
