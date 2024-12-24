@@ -1,10 +1,44 @@
-import { useRef } from "react";
+import { useRef, useEffect, useState } from "react";
+import { useDropzone } from 'react-dropzone';
 import styles from "./UploadButton.module.scss";
 import { Document } from "../Svgs";
 import PropTypes from 'prop-types'
 
 const UploadButton = ({ uploads, setUploads }) => {
+  const [networkSpeed, setNetworkSpeed] = useState(1);
   const fileInputRef = useRef(null);
+
+  useEffect(() => {
+    const connection = navigator.connection || 
+                      navigator.mozConnection || 
+                      navigator.webkitConnection;
+                      
+    if (connection) {
+      const speedMap = {
+        'slow-2g': 0.1,    // 100 KB/s
+        '2g': 0.25,        // 250 KB/s
+        '3g': 1,           // 1 MB/s
+        '4g': 10,          // 10 MB/s
+        '5g': 20,          // 20 MB/s
+        'wifi': 10,        // 10 MB/s
+        'ethernet': 50     // 50 MB/s
+      };
+
+      console.log('Тип соединения:', connection.effectiveType);
+      const speed = speedMap[connection.effectiveType] || 1;
+      console.log('Расчетная скорость:', speed, 'MB/s');
+      setNetworkSpeed(speed);
+
+      // Обновляем скорость при изменении соединения
+      connection.addEventListener('change', () => {
+        const newSpeed = speedMap[connection.effectiveType] || 1;
+        console.log('Соединение изменилось. Новая скорость:', newSpeed, 'MB/s');
+        setNetworkSpeed(newSpeed);
+      });
+    } else {
+      console.log('Network Information API не поддерживается');
+    }
+  }, []);
 
   const handleContainerClick = () => {
     fileInputRef.current?.click();
@@ -22,61 +56,71 @@ const UploadButton = ({ uploads, setUploads }) => {
 
   const uploadFile = async (file, index) => {
     return new Promise((resolve, reject) => {
-      const reader = new FileReader();
+      const CHUNK_SIZE = 1024 * 1024; // 1MB chunks
+      let offset = 0;
+      let progress = 0;
 
-      reader.onloadstart = () => {
-        setUploads((prevUploads) => {
-          const newUploads = [...prevUploads];
-          if (newUploads[index]) {
-            newUploads[index].progress = 0;
-          }
-          return newUploads;
-        });
-      };
+      const delay = Math.max(
+        (CHUNK_SIZE / (networkSpeed * 1024 * 1024)) * 1000,
+        100
+      );
 
-      reader.onprogress = (event) => {
-        if (event.lengthComputable) {
-          const progress = Math.round((event.loaded * 100) / event.total);
+      const readNextChunk = () => {
+        const chunk = file.slice(offset, offset + CHUNK_SIZE);
+        const reader = new FileReader();
+
+        reader.onload = () => {
+          offset += chunk.size;
+          
+          setTimeout(() => {
+            progress = Math.min(Math.round((offset / file.size) * 100), 99);
+            
+            setUploads((prevUploads) => {
+              const newUploads = [...prevUploads];
+              if (newUploads[index]) {
+                newUploads[index].progress = progress;
+              }
+              return newUploads;
+            });
+
+            if (offset < file.size) {
+              readNextChunk();
+            } else {
+              setTimeout(() => {
+                setUploads((prevUploads) => {
+                  const newUploads = [...prevUploads];
+                  if (newUploads[index]) {
+                    newUploads[index].progress = 100;
+                    newUploads[index].uploaded = true;
+                  }
+                  return newUploads;
+                });
+                resolve();
+              }, 500);
+            }
+          }, delay);
+        };
+
+        reader.onerror = () => {
           setUploads((prevUploads) => {
             const newUploads = [...prevUploads];
             if (newUploads[index]) {
-              newUploads[index].progress = progress;
+              newUploads[index].error = true;
             }
             return newUploads;
           });
-        }
+          reject(new Error('Ошибка чтения файла'));
+        };
+
+        reader.readAsArrayBuffer(chunk);
       };
 
-      reader.onload = () => {
-        setUploads((prevUploads) => {
-          const newUploads = [...prevUploads];
-          if (newUploads[index]) {
-            newUploads[index].progress = 100;
-            newUploads[index].uploaded = true;
-          }
-          return newUploads;
-        });
-        resolve();
-      };
-
-      reader.onerror = () => {
-        setUploads((prevUploads) => {
-          const newUploads = [...prevUploads];
-          if (newUploads[index]) {
-            newUploads[index].error = true;
-          }
-          return newUploads;
-        });
-        reject(new Error('Ошибка чтения файла'));
-      };
-
-      reader.readAsDataURL(file);
+      readNextChunk();
     });
   };
 
-  const handleFileUpload = (event) => {
-    const files = event.target.files;
-    if (files) {
+  const handleFiles = (files) => {
+    if (files?.length) {
       const newUploads = Array.from(files).map((file) => ({
         file,
         progress: 0,
@@ -94,6 +138,15 @@ const UploadButton = ({ uploads, setUploads }) => {
     }
   };
 
+  const handleFileUpload = (event) => {
+    handleFiles(event.target.files);
+  };
+
+  const { getRootProps, getInputProps, isDragActive } = useDropzone({
+    onDrop: handleFiles,
+    noClick: true
+  });
+
   const formatBytes = (bytes, decimals = 2) => {
     if (bytes === 0) return "0 Bytes";
     const k = 1024;
@@ -104,14 +157,13 @@ const UploadButton = ({ uploads, setUploads }) => {
   };
 
   return (
-    <div className={styles.wrapper}>
+    <div className={styles.wrapper} {...getRootProps()}>
       <div onClick={handleContainerClick} className={styles.container}>
         <input
-          type="file"
-          multiple
-          className={styles.input}
+          {...getInputProps()}
           ref={fileInputRef}
           onChange={handleFileUpload}
+          className={styles.input}
         />
         <div className={styles.content}>
           <div className={styles.icon}>
@@ -132,8 +184,10 @@ const UploadButton = ({ uploads, setUploads }) => {
             </svg>
           </div>
           <p className={styles.text}>
-            <span className={styles.firstText}>Нажмите здесь</span>
-            <span>или перетащите файлы сюда</span>
+            <span className={styles.firstText}>
+              {isDragActive ? 'Перетащите файлы сюда' : 'Нажмите здесь'}
+            </span>
+            <span>{!isDragActive && 'или перетащите файлы сюда'}</span>
           </p>
         </div>
       </div>
@@ -141,7 +195,6 @@ const UploadButton = ({ uploads, setUploads }) => {
         <div className={styles.uploadList}>
           {uploads?.map((upload, index) => (
             <div key={index} className={styles.uploadItem}>
-
               <div className={styles.fileInfo}>
                 <div className={styles.fileName}>
                   <div className={styles.topDiv}>
