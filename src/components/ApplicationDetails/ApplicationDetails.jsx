@@ -78,8 +78,9 @@ const ApplicationDetails = ({ data }) => {
                 </td>
                 <td>{fileExt}</td>
                 <td>
-                    <button 
-                        onClick={() => downloadFile(fileUrl, description)}
+                    <a 
+                        href={`${fileUrl}`}
+                        download
                         className={styles.downloadButton}
                     >
                         <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -87,15 +88,10 @@ const ApplicationDetails = ({ data }) => {
                                 stroke="#0B7D5F" strokeWidth="1.66667" strokeLinecap="round" strokeLinejoin="round" />
                         </svg>
                         Скачать
-                    </button>
+                    </a>
                 </td>
             </tr>
         );
-    };
-
-    const renderFiles = (files, description) => {
-        if (!files || !files.length) return null;
-        return files.map(file => renderFile(file, description));
     };
 
     const downloadAllFiles = async () => {
@@ -131,31 +127,44 @@ const ApplicationDetails = ({ data }) => {
     };
 
     const getFilteredFiles = () => {
-        if (!selectedFilter) return [
-            ...(data.actSverki ? [{ file: data.actSverki, description: 'Акт сверки' }] : []),
-            ...(data.fileAct ? [{ file: data.fileAct, description: 'Акт' }] : []),
-            ...(data.fileExplain ? [{ file: data.fileExplain, description: 'Пояснение' }] : []),
-            ...(data.cart60file ? [{ file: data.cart60file, description: 'Карточка 60 счета' }] : []),
-            ...(data.allDocuments?.map(file => ({ file, description: 'Все документы' })) || []),
-            ...(data.previousDocuments?.map(file => ({ file, description: 'Предыдущие документы' })) || [])
-        ];
-
-        switch (selectedFilter) {
-            case 'act':
-                return data.fileAct ? [{ file: data.fileAct, description: 'Акт' }] : [];
-            case 'cart60':
-                return data.cart60file ? [{ file: data.cart60file, description: 'Карточка 60 счета' }] : [];
-            case 'actSverki':
-                return data.actSverki ? [{ file: data.actSverki, description: 'Акт сверки' }] : [];
-            case 'explain':
-                return data.fileExplain ? [{ file: data.fileExplain, description: 'Пояснение' }] : [];
-            case 'allDocs':
-                return data.allDocuments?.map(file => ({ file, description: 'Все документы' })) || [];
-            case 'previousDocs':
-                return data.previousDocuments?.map(file => ({ file, description: 'Предыдущие документы' })) || [];
-            default:
-                return [];
+        const files = [];
+        
+        // Добавляем только существующие файлы
+        if (data.actSverki && data.actSverki.length > 0) {
+            files.push({ file: data.actSverki, description: 'Акт сверки' });
         }
+        if (data.fileAct && data.fileAct.length > 0) {
+            files.push({ file: data.fileAct, description: 'Акт' });
+        }
+        if (data.fileExplain && data.fileExplain.length > 0) {
+            files.push({ file: data.fileExplain, description: 'Пояснение' });
+        }
+        if (data.cart60file && data.cart60file.length > 0) {
+            files.push({ file: data.cart60file, description: 'Карточка 60 счета' });
+        }
+        if (data.allDocuments && data.allDocuments.length > 0) {
+            files.push(...data.allDocuments.map(file => ({ file, description: 'Все документы' })));
+        }
+        if (data.previousDocuments && data.previousDocuments.length > 0) {
+            files.push(...data.previousDocuments.map(file => ({ file, description: 'Предыдущие документы' })));
+        }
+
+        // Если выбран фильтр, возвращаем только соответствующие файлы
+        if (selectedFilter) {
+            return files.filter(item => {
+                switch (selectedFilter) {
+                    case 'act': return item.description === 'Акт';
+                    case 'cart60': return item.description === 'Карточка 60 счета';
+                    case 'actSverki': return item.description === 'Акт сверки';
+                    case 'explain': return item.description === 'Пояснение';
+                    case 'allDocs': return item.description === 'Все документы';
+                    case 'previousDocs': return item.description === 'Предыдущие документы';
+                    default: return false;
+                }
+            });
+        }
+
+        return files;
     };
 
     return (
@@ -293,7 +302,7 @@ const ApplicationDetails = ({ data }) => {
                             </tr>
                         </thead>
                         <tbody>
-                            {getFilteredFiles().map(({ file, description }, index) => 
+                            {getFilteredFiles().map(({ file, description }) => 
                                 renderFile(file, description)
                             )}
                         </tbody>
