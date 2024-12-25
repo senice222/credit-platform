@@ -97,19 +97,23 @@ const ApplicationDetails = ({ data }) => {
     const downloadAllFiles = async () => {
         try {
             const files = [
-                ...(data.actSverki ? [{ url: data.actSverki }] : []),
-                ...(data.fileAct ? [{ url: data.fileAct }] : []),
-                ...(data.fileExplain ? [{ url: data.fileExplain }] : []),
-                ...(data.cart60file ? [{ url: data.cart60file }] : []),
-                ...(data.allDocuments?.map(file => ({ url: file })) || []),
-                ...(data.previousDocuments?.map(file => ({ url: file })) || [])
+                ...(data.actSverki ? [{ url: data.actSverki, name: 'Акт сверки' }] : []),
+                ...(data.fileAct ? [{ url: data.fileAct, name: 'Акт' }] : []),
+                ...(data.fileExplain ? [{ url: data.fileExplain, name: 'Пояснение' }] : []),
+                ...(data.cart60file ? [{ url: data.cart60file, name: 'Карточка 60 счета' }] : []),
+                ...(data.allDocuments?.map(file => ({ url: file, name: 'Все документы' })) || []),
+                ...(data.previousDocuments?.map(file => ({ url: file, name: 'Предыдущие документы' })) || [])
             ];
 
-            // Скачиваем каждый файл отдельно
             files.forEach(file => {
                 const link = document.createElement('a');
                 link.href = `${file.url}`;
-                link.download = file.url;
+                
+                // Получаем расширение из URL файла
+                // const extension = file.url.split('.').pop();
+                // Используем понятное название + расширение
+                link.download = `${file.name}`;
+                
                 link.style.display = 'none';
                 document.body.appendChild(link);
                 link.click();
@@ -119,7 +123,6 @@ const ApplicationDetails = ({ data }) => {
             console.error('Ошибка при скачивании файлов:', error);
         }
     };
-
     const [selectedFilter, setSelectedFilter] = useState("");
 
     const handleFilterChange = (e) => {
