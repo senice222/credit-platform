@@ -108,8 +108,8 @@ const ApplicationDetails = ({ data }) => {
             // Скачиваем каждый файл отдельно
             files.forEach(file => {
                 const link = document.createElement('a');
-                link.href = `/uploads/${file.url}`;
-                link.download = file.url; // Имя файла будет оригинальным
+                link.href = `${file.url}`;
+                link.download = file.url;
                 link.style.display = 'none';
                 document.body.appendChild(link);
                 link.click();
