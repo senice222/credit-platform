@@ -99,7 +99,7 @@ const ApplicationDetails = ({ data }) => {
             const files = [
                 ...(data.actSverki ? [{ url: data.actSverki, name: 'Акт сверки' }] : []),
                 ...(data.fileAct ? [{ url: data.fileAct, name: 'Акт' }] : []),
-                ...(data.fileExplain ? [{ url: data.fileExplain, name: 'Пояснение' }] : []),
+                // ...(data.fileExplain ? [{ url: data.fileExplain, name: 'Пояснение' }] : []),
                 ...(data.cart60file ? [{ url: data.cart60file, name: 'Карточка 60 счета' }] : []),
                 ...(data.allDocuments?.map(file => ({ url: file, name: 'Все документы' })) || []),
                 ...(data.previousDocuments?.map(file => ({ url: file, name: 'Предыдущие документы' })) || [])
