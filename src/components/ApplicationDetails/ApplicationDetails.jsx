@@ -112,6 +112,7 @@ const ApplicationDetails = ({ data }) => {
                 // Получаем расширение из URL файла
                 // const extension = file.url.split('.').pop();
                 // Используем понятное название + расширение
+                console.log(file.name)
                 link.download = `${file.name}`;
                 
                 link.style.display = 'none';
