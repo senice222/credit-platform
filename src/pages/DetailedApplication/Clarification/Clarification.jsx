@@ -1,7 +1,6 @@
 import PropTypes from 'prop-types'
 import styles from '../DetailedApplication.module.scss'
 import { Pdf, Docs, Document } from "../Svgs";
-import { url } from '../../../core/axios';
 
 const getFileExtension = (url) => {
     const pathname = new URL(url).pathname;
@@ -34,7 +33,7 @@ const Clarifications = ({ clarificationsAnswer }) => {
                                 {Icon}
                                 <div>
                                     <p>{`Файл уточнения ${fileIndex + 1}${fileExtension}`}</p>
-                                    <a href={`${url}/uploads/${file}`} download>Скачать</a>
+                                    <a href={`${file}`} download>Скачать</a>
                                 </div>
                             </div>
                         );

@@ -136,9 +136,9 @@ const ApplicationDetails = ({ data }) => {
         if (data.fileAct && data.fileAct.length > 0) {
             files.push({ file: data.fileAct, description: 'Акт' });
         }
-        if (data.fileExplain && data.fileExplain.length > 0) {
-            files.push({ file: data.fileExplain, description: 'Пояснение' });
-        }
+        // if (data.fileExplain && data.fileExplain.length > 0) {
+        //     files.push({ file: data.fileExplain, description: 'Пояснение' });
+        // }
         if (data.cart60file && data.cart60file.length > 0) {
             files.push({ file: data.cart60file, description: 'Карточка 60 счета' });
         }
@@ -156,7 +156,7 @@ const ApplicationDetails = ({ data }) => {
                     case 'act': return item.description === 'Акт';
                     case 'cart60': return item.description === 'Карточка 60 счета';
                     case 'actSverki': return item.description === 'Акт сверки';
-                    case 'explain': return item.description === 'Пояснение';
+                    // case 'explain': return item.description === 'Пояснение';
                     case 'allDocs': return item.description === 'Все документы';
                     case 'previousDocs': return item.description === 'Предыдущие документы';
                     default: return false;
