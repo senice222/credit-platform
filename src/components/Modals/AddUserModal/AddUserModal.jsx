@@ -1,10 +1,9 @@
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import s from "./AddUserModal.module.scss";
 import Modal from "../../Modal/Modal";
 import CheckBox from './CheckBox/CheckBox';
-import useSWR, { useSWRConfig } from "swr";
+import { useSWRConfig } from "swr";
 import { fetcher, url } from "../../../core/axios";
-import Loader from "../../Loader/Loader";
 import { useSelector } from "react-redux";
 import { Warning } from "../../Svgs/Svgs";
 
@@ -13,7 +12,6 @@ const AddUserModal = ({ isActive, setActive, admin }) => {
     const [username, setUsername] = useState("");
     const [password, setPassword] = useState("");
     const [comment, setComment] = useState("");
-    const [modulesAccess, setModulesAccess] = useState([]);
     const [mail, setMail] = useState(false);
     const [application, setApplication] = useState(false);
     const [company, setCompany] = useState(false);
@@ -25,7 +23,7 @@ const AddUserModal = ({ isActive, setActive, admin }) => {
     const [acts, setActs] = useState(false);
     const [requirements, setRequirements] = useState(false);
     const [creditors, setCreditors] = useState(false);
-    console.log(admin)
+
     useEffect(() => {
         if (admin === null) {
             setFullName('')

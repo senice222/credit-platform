@@ -1,62 +1,60 @@
+import { useState } from 'react'
 import styles from './Samples.module.scss'
+import { AddClient } from '../../components/Modals/AddClientModal/AddClient'
 
 const Samples = () => {
+    const [isAddClient, setAddClient] = useState(false)
+
     return (
-        <div className={styles.container}>
-            <h1 className={styles.title}>Настройки</h1>
-            
-            <div className={styles.tabSection}>
-                <div className={styles.tabHeader}>Шаблоны уточнений</div>
-                <div className={styles.tabDescription}>
-                    Здесь вы можете настроить шаблонные ответы для уточнения
+        <>
+            <AddClient
+                isOpened={isAddClient}
+                setOpened={() => setAddClient((prev) => !prev)}
+            />
+            <div className={styles.container}>
+                <div className={styles.header}>
+                    <h1 className={styles.title}>Все клиенты</h1>
+                    <button className={styles.registerButton} onClick={() => setAddClient(true)}>
+                        Зарегистрировать клиента
+                    </button>
                 </div>
-            </div>
 
-            <div className={styles.samplesHeader}>
-                <div className={styles.columnName}>Название шаблона</div>
-                <button className={styles.addButton}>
-                    <span>+</span> Добавить шаблон
-                </button>
-            </div>
+                <div className={styles.searchContainer}>
+                    <input
+                        type="search"
+                        placeholder="Поиск по клиенту"
+                        className={styles.searchInput}
+                    />
+                </div>
 
-            <div className={styles.samplesList}>
-                <div className={styles.sampleItem}>
-                    <span>Шаблон 1</span>
-                    <div className={styles.actions}>
-                        <button className={styles.iconButton}>📋</button>
-                        <button className={styles.iconButton}>✏️</button>
-                    </div>
-                </div>
-                <div className={styles.sampleItem}>
-                    <span>Шаблон 2</span>
-                    <div className={styles.actions}>
-                        <button className={styles.iconButton}>📋</button>
-                        <button className={styles.iconButton}>✏️</button>
-                    </div>
-                </div>
-                <div className={styles.sampleItem}>
-                    <span>Шаблон 3</span>
-                    <div className={styles.actions}>
-                        <button className={styles.iconButton}>📋</button>
-                        <button className={styles.iconButton}>✏️</button>
-                    </div>
+                <div className={styles.tableContainer}>
+                    <table className={styles.clientsTable}>
+                        <thead>
+                            <tr>
+                                <th>Клиент</th>
+                                <th>Активных заявок</th>
+                                <th>Всего заявок</th>
+                                <th></th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {[...Array(10)].map((_, index) => (
+                                <tr key={index}>
+                                    <td>Клиент</td>
+                                    <td>1</td>
+                                    <td>1</td>
+                                    <td>
+                                        {/* <button className={styles.arrowButton}> */}
+                                        {/* → */}
+                                        {/* </button> */}
+                                    </td>
+                                </tr>
+                            ))}
+                        </tbody>
+                    </table>
                 </div>
             </div>
-
-            <div className={styles.pagination}>
-                <button className={styles.paginationButton}>← Назад</button>
-                <div className={styles.paginationNumbers}>
-                    <span className={styles.active}>1</span>
-                    <span>2</span>
-                    <span>3</span>
-                    <span>...</span>
-                    <span>8</span>
-                    <span>9</span>
-                    <span>10</span>
-                </div>
-                <button className={styles.paginationButton}>Далее →</button>
-            </div>
-        </div>
+        </>
     )
 }
 

@@ -8,6 +8,7 @@ import { useSelector, useDispatch } from "react-redux";
 import Loader from "../../components/Loader/Loader";
 import { fetchAuthMe } from "../../store/slices/Admin.slice";
 import { CrossReport } from "../DetailedApplication/Svgs";
+import { AddClient } from "../../components/Modals/AddClientModal/AddClient";
 
 const Settings = () => {
   const [active, setActive] = useState(false);
