@@ -6,6 +6,7 @@ import { useSWRConfig } from "swr";
 import { fetcher, url } from "../../../core/axios";
 import { useSelector } from "react-redux";
 import { Warning } from "../../Svgs/Svgs";
+import { notification } from "antd";
 
 const AddUserModal = ({ isActive, setActive, admin }) => {
     const [fullName, setFullName] = useState("");
@@ -23,6 +24,9 @@ const AddUserModal = ({ isActive, setActive, admin }) => {
     const [acts, setActs] = useState(false);
     const [requirements, setRequirements] = useState(false);
     const [creditors, setCreditors] = useState(false);
+    const [clientAccess, setClientAccess] = useState(false);
+    const [botAccess, setBotAccess] = useState(false);
+
 
     useEffect(() => {
         if (admin === null) {
@@ -52,14 +56,24 @@ const AddUserModal = ({ isActive, setActive, admin }) => {
             setActs(admin.modulesAccess?.includes("Акты"))
             setRequirements(admin.modulesAccess?.includes("Требования"))
             setCreditors(admin.modulesAccess?.includes("Кредиторка"))
+            setClientAccess(admin.clientAccess)
+            setBotAccess(admin.botAccess)
         }
     }, [admin])
 
     const handleCreate = async () => {
         if (!admin) {
             const bodyParams = {
-                login: username, password: password, comment, access: [], superAdmin: isSuper, modulesAccess: []
-            }
+                login: username,
+                password: password,
+                comment,
+                access: [],
+                superAdmin: isSuper,
+                modulesAccess: [],
+                clientAccess,
+                botAccess
+            };
+            
             if (isSuper) {
                 bodyParams.access.push("Почта");
                 bodyParams.access.push("Заявки");
@@ -67,6 +81,8 @@ const AddUserModal = ({ isActive, setActive, admin }) => {
                 bodyParams.modulesAccess.push("Акты");
                 bodyParams.modulesAccess.push("Требования");
                 bodyParams.modulesAccess.push("Кредиторка");
+                bodyParams.clientAccess = true;
+                bodyParams.botAccess = true;
             } else {
                 if (mail) bodyParams.access.push("Почта");
                 if (application) bodyParams.access.push("Заявки");
@@ -74,25 +90,45 @@ const AddUserModal = ({ isActive, setActive, admin }) => {
                 if (acts) bodyParams.modulesAccess.push("Акты");
                 if (requirements) bodyParams.modulesAccess.push("Требования");
                 if (creditors) bodyParams.modulesAccess.push("Кредиторка");
+                if (clientAccess) bodyParams.clientAccess = true;
+                if (botAccess) bodyParams.botAccess = true;
             }
-            await mutate(`${url}/admins`, fetcher(`${url}/admin/create`, {
-                method: "POST",
-                body: JSON.stringify(bodyParams)
-            }))
-            setFullName('')
-            setUsername('')
-            setPassword('')
-            setComment('')
-            setMail(false)
-            setApplication(false)
-            setCompany(false)
-            setRoles(false)
-            setBlocked(false)
-            setActive()
-            setSuper(false)
+
+            try {
+                const response = await fetcher(`${url}/admin/create`, {
+                    method: "POST",
+                    body: JSON.stringify(bodyParams)
+                });
+
+                if (response.botVerificationCode) {
+                    notification.info({
+                        message: "Ссылка для доступа к боту",
+                        description: `https://t.me/test182828_bot?start=${response.botVerificationCode}`,
+                        duration: 0
+                    });
+                }
+
+                mutate(`${url}/admins`, response.admins);
+                setFullName('')
+                setUsername('')
+                setPassword('')
+                setComment('')
+                setMail(false)
+                setApplication(false)
+                setCompany(false)
+                setRoles(false)
+                setBlocked(false)
+                setActive(false)
+                setSuper(false)
+            } catch (error) {
+                notification.error({
+                    message: "Ошибка",
+                    description: error.message || "Не удалось создать администратора"
+                });
+            }
         } else {
             const bodyParams = {
-                fio: fullName, login: username, comment, access: [], superAdmin: isSuper, modulesAccess: []
+                fio: fullName, login: username, comment, access: [], superAdmin: isSuper, modulesAccess: [], clientAccess, botAccess
             }
             if (isSuper) {
                 bodyParams.access.push("Почта");
@@ -101,6 +137,8 @@ const AddUserModal = ({ isActive, setActive, admin }) => {
                 bodyParams.modulesAccess.push("Акты");
                 bodyParams.modulesAccess.push("Требования");
                 bodyParams.modulesAccess.push("Кредиторка");
+                bodyParams.clientAccess = true;
+                bodyParams.botAccess = true;
             } else {
                 if (mail) bodyParams.access.push("Почта");
                 if (application) bodyParams.access.push("Заявки");
@@ -108,6 +146,8 @@ const AddUserModal = ({ isActive, setActive, admin }) => {
                 if (acts) bodyParams.modulesAccess.push("Акты");
                 if (requirements) bodyParams.modulesAccess.push("Требования");
                 if (creditors) bodyParams.modulesAccess.push("Кредиторка");
+                if (clientAccess) bodyParams.clientAccess = true;
+                if (botAccess) bodyParams.botAccess = true;
             }
 
             await mutate(`${url}/admins`, fetcher(`${url}/admin/${admin._id}`, {
@@ -171,8 +211,8 @@ const AddUserModal = ({ isActive, setActive, admin }) => {
                 <div className={s.textareaDiv}>
                     {admin?.login !== login && !isSuper && (<h2>Доступ к модулям <span>*</span></h2>)}
                     {!isSuper && <div className={s.checkBoxes}>
-                        <div 
-                            className={`${s.checkBoxBlock} ${acts ? s.active : ''}`} 
+                        <div
+                            className={`${s.checkBoxBlock} ${acts ? s.active : ''}`}
                             onClick={() => setActs((value) => !value)}
                         >
                             <div className={s.topContainer}>
@@ -180,8 +220,8 @@ const AddUserModal = ({ isActive, setActive, admin }) => {
                                 <CheckBox value={acts} />
                             </div>
                         </div>
-                        <div 
-                            className={`${s.checkBoxBlock} ${requirements ? s.active : ''}`} 
+                        <div
+                            className={`${s.checkBoxBlock} ${requirements ? s.active : ''}`}
                             onClick={() => setRequirements((value) => !value)}
                         >
                             <div className={s.topContainer}>
@@ -189,8 +229,8 @@ const AddUserModal = ({ isActive, setActive, admin }) => {
                                 <CheckBox value={requirements} />
                             </div>
                         </div>
-                        <div 
-                            className={`${s.checkBoxBlock} ${creditors ? s.active : ''}`} 
+                        <div
+                            className={`${s.checkBoxBlock} ${creditors ? s.active : ''}`}
                             onClick={() => setCreditors((value) => !value)}
                         >
                             <div className={s.topContainer}>
@@ -233,6 +273,20 @@ const AddUserModal = ({ isActive, setActive, admin }) => {
                             </div>
                         )
                     }
+                    <div onClick={() => setClientAccess((value) => !value)} className={s.superAdminBlock}>
+                        <div className={s.checkBOxic}><CheckBox value={clientAccess} /></div>
+                        <div className={s.rightDiv}>
+                            <h5>Выдать доступ к разделу "Клиенты" Кредиторки</h5>
+                            <p>Администратор сможет регистрировать клиентов и блокировать их.</p>
+                        </div>
+                    </div>
+                    <div onClick={() => setBotAccess((value) => !value)} className={s.superAdminBlock}>
+                        <div className={s.checkBOxic}><CheckBox value={botAccess} /></div>
+                        <div className={s.rightDiv}>
+                            <h5>Выдать доступ к Telegram-боту Кредиторки</h5>
+                            <p>У администратора будут все те же доступы, что и в веб-версии</p>
+                        </div>
+                    </div>  
                 </div>
                 <div className={s.btns}>
                     <button className={s.whiteBtn} onClick={() => setActive(false)}>Отмена</button>

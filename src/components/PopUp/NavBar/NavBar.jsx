@@ -87,15 +87,15 @@ const NavBar = ({ isActive, setActive }) => {
           </div>
         </div>
         <div className={styles.settings}>
-          {admin.superAdmin && <div
+          {admin.clientAccess && <div
             className={styles.itemSettings}
             onClick={() => {
-              navigate("/settings")
+              navigate("/clients")
               setActive(false)
             }}
           >
-            <img src={settings} alt={"/"} />
-            <p className={styles.settingsText}>Настройки</p>
+            <img src={user} alt={"/"} />
+            <p className={styles.settingsText}>Клиенты</p>
           </div>}
 
           <div className={styles.admin}>

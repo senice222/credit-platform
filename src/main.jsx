@@ -17,6 +17,7 @@ import DetailedCompany from "./pages/DetailedCompany/DetailedCompany.jsx";
 import ChooseModule from "./pages/ChooseModule/ChooseModule.jsx";
 import Samples from "./pages/Samples/Samples.jsx";
 import Settings from "./pages/Settings/Settings.jsx";
+import DetailedClient from "./pages/DetailedClient/DetailedClient.jsx";
 
 const router = createBrowserRouter([
   {
@@ -56,7 +57,7 @@ const router = createBrowserRouter([
         element: <Companies />,
       },
       {
-        path: "/settings",
+        path: "/clients",
         element: <Samples />,
       },
       {
@@ -66,6 +67,10 @@ const router = createBrowserRouter([
       {
         path: "/application/:id",
         element: <DetailedApplication />,
+      },
+      {
+        path: "/clients/:id",
+        element: <DetailedClient />,
       },
       
     ],
