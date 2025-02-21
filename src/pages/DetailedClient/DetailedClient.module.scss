@@ -310,49 +310,85 @@
         text-align: center;
     }
 }
-
-.DetailedClient {
-    padding: 24px;
+.activeBadge {
+    background-color: #ecfdf3;
+    color: #067647 !important;
+    border: 1px solid #abefc6 !important;
+    padding: 2px 8px;
+    border-radius: 12px;
+    font-weight: 500;
 }
 
-.header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 24px;
-
-    h1 {
-        font-size: 24px;
+.blocked {
+    margin-top: 5px;
+    background-color: #fef3f2;
+    color: #b42318 !important;
+    border: 1px solid #fecdca !important;
+    padding: 2px 8px;
+    border-radius: 12px;
+    font-weight: 500;
+}
+.flexEnd {
+    
+    .active {
+        background-color: #ecfdf3;
+        color: #067647 !important;
+        border: 1px solid #abefc6 !important;
+        padding: 2px 8px;
+        border-radius: 12px;
         font-weight: 500;
-        color: #101828;
     }
 
-    .actions {
-        display: flex;
-        gap: 12px;
+    .inactive {
+        background-color: #fffaeb;
+        color: #b54708 !important;
+        border: 1px solid #fedf89 !important;
+        padding: 2px 8px;
+        border-radius: 12px;
+        font-weight: 500;
+    }
 
-        button {
-            padding: 10px 16px;
-            border-radius: 8px;
-            font-weight: 600;
-            font-size: 14px;
-            cursor: pointer;
-        }
-
-        .blockButton {
-            background: #D92D20;
-            color: white;
-            border: none;
-        }
-
-        .editButton {
-            background: #039855;
-            color: white;
-            border: none;
-        }
+    .blocked {
+        background-color: #fef3f2;
+        color: #b42318 !important;
+        border: 1px solid #fecdca !important;
+        padding: 2px 8px;
+        border-radius: 12px;
+        font-weight: 500;
+    }
+    .onClarification {
+        background-color: #f9f5ff;
+        color: #6941c6 !important;
+        border: 1px solid #e9d7fe !important;
+        padding: 2px 8px;
+        border-radius: 12px;
+        font-weight: 500;
     }
 }
+.actions {
+    display: flex;
+    gap: 12px;
 
+    button {
+        padding: 10px 16px;
+        border-radius: 8px;
+        font-weight: 600;
+        font-size: 14px;
+        cursor: pointer;
+    }
+
+    .blockButton {
+        background: #D92D20;
+        color: white;
+        border: none;
+    }
+
+    .editButton {
+        background: #039855;
+        color: white;
+        border: none;
+    }
+}
 .clientInfo {
     display: grid;
     grid-template-columns: repeat(4, 1fr);

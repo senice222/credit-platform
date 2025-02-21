@@ -66,7 +66,7 @@ const DetailedCompany = () => {
         'На рассмотрении': style.active,
         'Рассмотрена': style.active
     }
-
+    console.log(data)
     if (!data) return <Loader />
 
     return (

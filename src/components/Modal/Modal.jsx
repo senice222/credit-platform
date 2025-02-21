@@ -2,7 +2,7 @@ import s from "./Modal.module.scss";
 import { Cross, Folder, Plus, Trash } from "./Svgs";
 import { useEffect } from "react";
 
-const Modal = ({ children, isOpened, height, setOpen, long, icon, text }) => {
+const Modal = ({ children, isOpened, width, height, setOpen, long, icon, text }) => {
   useEffect(() => {
     if (isOpened) {
       document.body.style.overflowY = "hidden";
@@ -17,7 +17,8 @@ const Modal = ({ children, isOpened, height, setOpen, long, icon, text }) => {
     >
       <div
         onClick={(e) => e.stopPropagation()}
-        className={`${s.content} ${height ? s.height : ""} ${long ? s.long : ""}`}
+        style={{ width: width ? width : "" }}
+        className={`${s.content}  ${height ? s.height : ""} ${long ? s.long : ""}`}
       >
         <div className={s.topDiv}>
           <div className={s.left}>

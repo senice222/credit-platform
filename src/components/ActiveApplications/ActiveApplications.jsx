@@ -129,7 +129,6 @@ const ActiveApplications = () => {
             {filteredData.map((application, i) => {
               const normalizedStatus = application.status.trim();
               const appliedStyle = statusStyles[normalizedStatus];
-              console.log(appliedStyle)
               return (
                 <tr key={i} onClick={() => navigate(`/application/${application._id}`)}>
                   <td >№{application.normalId}</td>

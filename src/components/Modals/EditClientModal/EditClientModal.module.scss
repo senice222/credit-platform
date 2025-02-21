@@ -1,0 +1,63 @@
+.font {
+    font-weight: 500;
+    font-size: 14px;
+    line-height: 20px;
+    color: #414651;
+}
+.firstBlock {
+    input {
+        margin-top: 4px;
+        border: 1px solid #d0d5dd;
+        padding: 6px;
+        font-size: 16px;
+        font-weight: 400;
+        outline: none;
+        width: 100%;
+        resize: none;
+        border-radius: 8px;
+    }
+}
+.secondBlock {
+    display: flex;
+    width: 100%;
+    gap: 12px;
+    margin-top: 50px;
+    button {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+    }
+    .white {
+        padding: 10px 16px;
+        background: #ffffff;
+        color: #414651;
+        border: 1px solid #d5d7da;
+        border-radius: 8px;
+        width: 50%;
+        font-weight: 600;
+        font-size: 14px;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        transition: 0.2s;
+    }
+    .green {
+        padding: 10px 16px;
+        background: #079455;
+        color: white;
+        border: none;
+        border-radius: 8px;
+        width: 50%;
+        font-weight: 600;
+        font-size: 14px;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        transition: 0.2s;
+        &:hover {
+            background: #067e48;
+        }
+    }
+}

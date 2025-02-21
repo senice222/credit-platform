@@ -1,10 +1,21 @@
 import { useState } from 'react'
 import styles from './Samples.module.scss'
 import { AddClient } from '../../components/Modals/AddClientModal/AddClient'
+import useSWR from 'swr'
+import { fetcher, url } from '../../core/axios'
+import Loader from '../../components/Loader/Loader'
+import { useNavigate } from 'react-router-dom'
+
+export const amountOfActive = (applications) => {
+    return applications?.map(item => item.status !== "Отклонена" || "Рассмотрена").length
+}
 
 const Samples = () => {
     const [isAddClient, setAddClient] = useState(false)
-
+    const { data: clients } = useSWR(`${url}/admin/clients/getClients`, fetcher)
+    const navigate = useNavigate()
+    if (!clients) return <Loader />
+    
     return (
         <>
             <AddClient
@@ -38,11 +49,11 @@ const Samples = () => {
                             </tr>
                         </thead>
                         <tbody>
-                            {[...Array(10)].map((_, index) => (
-                                <tr key={index}>
-                                    <td>Клиент</td>
-                                    <td>1</td>
-                                    <td>1</td>
+                            {clients?.map((client, index) => (
+                                <tr key={index} onClick={() => navigate(`/clients/${client._id}`)}>
+                                    <td>{client.name}</td>
+                                    <td>{amountOfActive(client.applications)}</td>
+                                    <td>{client.applications.length}</td>
                                     <td>
                                         {/* <button className={styles.arrowButton}> */}
                                         {/* → */}

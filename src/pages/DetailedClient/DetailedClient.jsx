@@ -10,58 +10,36 @@ import Loader from '../../components/Loader/Loader';
 import { Calendar } from '../../components/Svgs/Svgs';
 import { useState } from 'react';
 import moment from 'moment';
+import { amountOfActive } from '../Samples/Samples';
+import EditClientModal from '../../components/Modals/EditClientModal/EditClientModal';
+import { BlockUser } from '../../components/Modals/BlockUser/BlockUser';
 
 const DetailedClient = () => {
-    const { id } = useParams();
-    const navigate = useNavigate();
-    const { data: client } = useSWR(`${url}/admin/client/${id}`, fetcher);
+    const { id } = useParams()
+    const { data } = useSWR(`${url}/admin/client/${id}`, fetcher);
     const [selectedStatus, setSelectedStatus] = useState('Все статусы');
     const [searchTerm, setSearchTerm] = useState('');
+    const [isActive, setIsActive] = useState(false)
+    const [isBlocked, setBlocked] = useState(false)
+    // const activeApplications = data?.filter(item => item.status !== "Рассмотрена" && item.status !== "Отклонена")
     const { mutate } = useSWRConfig()
-
-    if (!client) return <Loader />;
-
-    const handleStatusChange = (value) => {
+    const navigate = useNavigate()
+    const disabledDate = (current) => {
+        return current && current < moment().startOf('day');
+    };
+    const handleChange = (value) => {
         setSelectedStatus(value);
     };
 
-    const handleCompanyClick = (inn) => {
-        navigate(`/company/${inn}`);
-    };
-
-    const handleBlockClient = async () => {
-        try {
-            await fetcher(`${url}/admin/blockClient/${id}`, {
-                method: 'POST'
-            });
-            notification.success({
-                message: "Клиент успешно заблокирован"
-            });
-        } catch (error) {
-            notification.error({
-                message: "Ошибка при блокировке клиента"
-            });
-        }
-    };
-
-    const handleEditName = async () => {
-        // Добавить логику изменения имени
-    };
-
-    const handleInnClick = (inn) => {
-        navigate(`/all-applications?inn=${inn}`);
-    };
-
-    const filteredData = client.applications && (
-        client.applications.filter(item => {
+    const filteredData = data?.applications ? (
+        data?.applications.filter(item => {
             const statusMatch = selectedStatus === 'Все статусы' || item.status === selectedStatus;
             const searchTermLower = searchTerm.toLowerCase();
-            const normalIdMatch = item.id.toString().toLowerCase().includes(searchTermLower);
+            const normalIdMatch = item.normalId.toString().toLowerCase().includes(searchTermLower);
 
             return statusMatch && (normalIdMatch);
         })
-    )
-
+    ) : []
     const dateOnChange = (date, id, _id) => {
         try {
             mutate(`${url}/application/getAll`, fetcher(`${url}/application/set-date/${id}`, {
@@ -82,102 +60,132 @@ const DetailedClient = () => {
     };
 
     const statusStyles = {
+        "Заблокирован": style.blocked,
+        "Активен": style.activeBadge,
+        "Активный": style.activeBadge,
         'В работе': style.inactive,
         'На уточнении': style.onClarification,
         'Отклонена': style.blocked,
-        'На рассмотрении': style.active,
-        'Рассмотрена': style.active
+        'На рассмотрении': style.activeBadge,
+        'Рассмотрена': style.activeBadge
     }
-
+    if (!data) return <Loader />
+    const appliedStatus = statusStyles[data.status];
+    const isUserBlocked = data.status === "Заблокирован"
     return (
-        <div className={style.DetailedClient}>
-            <PathComponent first={"Клиенты"} path={"/clients"} second={client.name} />
-            
-            <div className={style.header}>
-                <h1>Профиль клиента {client.name}</h1>
+        <div className={style.DetailedApplication}>
+            <EditClientModal
+                isActive={isActive}
+                setActive={() => setIsActive((prev) => !prev)}
+                name={data.name}
+                id={id}
+            />
+            <BlockUser
+                data={data}
+                isOpen={isBlocked}
+                setOpen={() => setBlocked((prev) => !prev)}
+                isUserBlocked={isUserBlocked}
+            />
+            <PathComponent first={"На клиентов"} path={"/clients"} second={`Клиент "${data?.name}"`} />
+            <div className={style.topContainer}>
+                <h1>Профиль компании {data?.name}</h1>
                 <div className={style.actions}>
-                    <button onClick={handleBlockClient} className={style.blockButton}>
-                        Заблокировать клиента
+                    <button className={!isUserBlocked ? style.blockButton : style.editButton} onClick={() => setBlocked(true)}>
+                        {isUserBlocked ? "Разблокировать клиента" : "Заблокировать клиента"}
                     </button>
-                    <button onClick={handleEditName} className={style.editButton}>
+                    <button className={style.editButton} onClick={() => setIsActive(true)}>
                         Изменить имя клиента
                     </button>
                 </div>
             </div>
+            <div className={style.company}>
+                <div className={style.item}>
+                    <p className={style.name}>Статус клиента</p>
+                    <span className={appliedStatus}>{data?.status}</span>
 
-            <div className={style.clientInfo}>
-                <div className={style.infoItem}>
-                    <span className={style.label}>Статус клиента</span>
-                    <span className={`${style.status} ${style.active}`}>Активный</span>
                 </div>
-                <div className={style.infoItem}>
-                    <span className={style.label}>Всего заявок</span>
-                    <span className={style.value}>{client.applications?.length || 0}</span>
+                <div className={style.item}>
+                    <p className={style.name}>Всего заявок</p>
+                    <div className={style.linkBlock}>
+                        <p className={style.active}>{data?.applications?.length}</p>
+                    </div>
                 </div>
-                <div className={style.infoItem}>
-                    <span className={style.label}>Активных заявок</span>
-                    <span className={style.value}>
-                        {client.applications?.filter(app => 
-                            app.status !== "Рассмотрена" && app.status !== "Отклонена"
-                        ).length || 0}
-                    </span>
+
+                <div className={style.item}>
+                    <p className={style.name}>Активных заявок</p>
+                    <div className={style.linkBlock}>
+                        <span className={style.active}>{amountOfActive(data?.applications)}</span>
+                    </div>
                 </div>
-                <div className={style.infoItem}>
-                    <span className={style.label}>Ссылка клиента</span>
-                    <div className={style.linkContainer}>
-                        <span className={style.link}>{client.botLink}</span>
-                        <button className={style.copyButton}>
-                            <CopyIcon />
-                        </button>
+                <div className={style.item}>
+                    <p className={style.name}>Ссылка клиента</p>
+                    <div className={style.linkBlock}>
+                        <span className={style.active} style={{ color: "#067647" }}>{data?.botLink?.slice(0, 20)}...</span>
                     </div>
                 </div>
             </div>
 
-            <div className={style.section}>
-                <h2>Компании клиента</h2>
-                <p className={style.subtitle}>Компании, с которых клиент {client.name} отправлял заявки</p>
-                
-                <table className={style.companiesTable}>
-                    <thead>
-                        <tr>
-                            <th>Компания</th>
-                            <th>Количество заявок</th>
-                            <th>Активных заявок</th>
-                            <th></th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {client.companies?.map(company => (
-                            <tr key={company.inn}>
-                                <td>
-                                    <div className={style.companyName}>
-                                        {company.name}
-                                        <span className={style.inn}>ИНН {company.inn}</span>
-                                    </div>
-                                </td>
-                                <td>№{company.totalApplications}</td>
-                                <td>№{company.activeApplications}</td>
-                                <td>
-                                    <button 
-                                        className={style.arrowButton}
-                                        onClick={() => handleCompanyClick(company.inn)}
-                                    >
-                                        <ArrowLink />
-                                    </button>
-                                </td>
+            <div className={style.wrapper}>
+                <div className={style.topDiv}>
+                    <h2>Компании клиента</h2>
+                    <p className={style.name}>Компании, с которых клиент {data?.name} отправлял заявки</p>
+                </div>
+
+                <div className={style.container}>
+                    <table className={style.usersTable}>
+                        <thead>
+                            <tr>
+                                <th>Компания</th>
+                                <th></th>
+                                <th className={style.thRight}>Количество заявок</th>
+                                <th className={style.thRight} style={{ paddingRight: "60px" }}>Активных заявок</th>
                             </tr>
-                        ))}
-                    </tbody>
-                </table>
+                        </thead>
+                        <tbody>
+                            {data?.companies?.map((application, i) => (
+                                <tr key={i} onClick={() => navigate(`/companies/${application.inn}`)}>
+                                    <td>{application.name}<br /> <span>ИНН {application.inn}</span></td>
+                                    <td></td>
+                                    <td className={style.flexEnd}>{application.applicationsCount}</td>
+                                    <td className={style.flexEnd}>
+                                        <div>
+                                            <div style={{ marginRight: "25px", display: "flex", justifyContent: "center", alignItems: "center" }}>{application.activeApplicationsCount}</div>
+                                            <button className={style.next} onClick={() => navigate(`/application/${application._id}`)}>
+                                                <svg
+                                                    width={20}
+                                                    height={20}
+                                                    viewBox="0 0 20 20"
+                                                    fill="none"
+                                                    xmlns="http://www.w3.org/2000/svg"
+                                                >
+                                                    <path
+                                                        d="M4.16675 10H15.8334M15.8334 10L10.0001 4.16669M15.8334 10L10.0001 15.8334"
+                                                        stroke="white"
+                                                        strokeWidth="1.66667"
+                                                        strokeLinecap="round"
+                                                        strokeLinejoin="round"
+                                                    />
+                                                </svg>
+                                            </button>
+                                        </div>
+                                    </td>
+                                </tr>
+
+                            ))}
+                        </tbody>
+                    </table>
+                </div>
             </div>
 
-            <div className={style.section}>
-                <h2>Заявки клиента</h2>
-                <div className={style.filters}>
+            <div className={style.wrapper}>
+                <div className={style.topDiv}>
+                    <h2>Заявки компании</h2>
+                </div>
+                <div className={style.topWrapper}>
                     <Select
-                        value={selectedStatus}
-                        onChange={handleStatusChange}
-                        style={{ width: 220 }}
+                        defaultValue="Все статусы"
+                        onChange={handleChange}
+                        style={{ width: 220, height: 44 }}
                         options={[
                             { value: 'Все статусы', label: 'Все статусы' },
                             { value: 'В работе', label: 'В работе' },
@@ -187,63 +195,79 @@ const DetailedClient = () => {
                             { value: 'Рассмотрена', label: 'Рассмотрена' },
                         ]}
                     />
-                    <input
-                        type="text"
-                        placeholder="Поиск по номеру заявки"
-                        value={searchTerm}
-                        onChange={(e) => setSearchTerm(e.target.value)}
-                        className={style.searchInput}
-                    />
+                    <div className={style.searchBar}>
+                        <input
+                            type="text"
+                            placeholder="Поиск по номеру заявки"
+                            value={searchTerm}
+                            onChange={(e) => setSearchTerm(e.target.value)}
+                        />
+                    </div>
                 </div>
-
-                <table className={style.applicationsTable}>
-                    <thead>
-                        <tr>
-                            <th>Номер заявки</th>
-                            <th>Компания</th>
-                            <th>Статус заявки</th>
-                            <th>Срок ответа</th>
-                            <th></th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {filteredData.map((application, i) => (
-                            <tr key={i}>
-                                <td>№{application.id}</td>
-                                <td>
-                                    <div className={style.companyName}>
-                                        {application.companyName}
-                                        <span className={style.inn}>ИНН {application.inn}</span>
-                                    </div>
-                                </td>
-                                <td>
-                                    <span className={`${style.status} ${style[application.status.toLowerCase()]}`}>
-                                        {application.status}
-                                    </span>
-                                </td>
-                                <td>{application.deadline || '—'}</td>
-                                <td>
-                                    <button 
-                                        className={style.arrowButton}
-                                        onClick={() => navigate(`/application/${application.id}`)}
-                                    >
-                                        <ArrowLink />
-                                    </button>
-                                </td>
+                <div className={style.container}>
+                    <table className={style.usersTable}>
+                        <thead>
+                            <tr>
+                                <th>Номер заявки</th>
+                                <th>Компания</th>
+                                <th className={style.thRight}>Статус заявки</th>
+                                <th className={style.thRight} style={{ paddingRight: "100px" }}>Срок ответа</th>
                             </tr>
-                        ))}
-                    </tbody>
-                </table>
+                        </thead>
+                        <tbody>
+                            {filteredData?.map((application, i) => (
+                                <tr key={i} onClick={() => navigate(`/application/${application._id}`)}>
+                                    <td>№{application.normalId}</td>
+                                    <td>{application.name}<br /> <span>ИНН {application.inn}</span></td>
+                                    <td className={style.flexEnd}><span className={statusStyles[application.status]}>{application.status}</span></td>
+                                    <td className={style.flexEnd}>
+                                        <div>
+                                            {
+                                                !application.dateAnswer ? (
+                                                    <div onClick={(e) => e.stopPropagation()}>
+                                                        <ConfigProvider locale={ruRU} >
+                                                            <DatePicker
+                                                                disabledDate={disabledDate}
+
+                                                                inputReadOnly
+                                                                onClick={(e) => e.stopPropagation()}
+                                                                onChange={(date) => dateOnChange(date, application.owner, application._id)}
+                                                            />
+                                                        </ConfigProvider>
+                                                    </div>
+                                                ) : <button className={style.btnDate} onClick={(e) => e.stopPropagation()}>
+                                                    <Calendar />
+                                                    {application.dateAnswer}
+                                                </button>
+                                            }
+                                            <button className={style.next} onClick={() => navigate(`/application/${application._id}`)}>
+                                                <svg
+                                                    width={20}
+                                                    height={20}
+                                                    viewBox="0 0 20 20"
+                                                    fill="none"
+                                                    xmlns="http://www.w3.org/2000/svg"
+                                                >
+                                                    <path
+                                                        d="M4.16675 10H15.8334M15.8334 10L10.0001 4.16669M15.8334 10L10.0001 15.8334"
+                                                        stroke="white"
+                                                        strokeWidth="1.66667"
+                                                        strokeLinecap="round"
+                                                        strokeLinejoin="round"
+                                                    />
+                                                </svg>
+                                            </button>
+                                        </div>
+                                    </td>
+                                </tr>
+
+                            ))}
+                        </tbody>
+                    </table>
+                </div>
             </div>
         </div>
-    );
-};
-
-const CopyIcon = () => (
-    <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
-        <path d="M16.6667 7.5H9.16667C8.24619 7.5 7.5 8.24619 7.5 9.16667V16.6667C7.5 17.5871 8.24619 18.3333 9.16667 18.3333H16.6667C17.5871 18.3333 18.3333 17.5871 18.3333 16.6667V9.16667C18.3333 8.24619 17.5871 7.5 16.6667 7.5Z" stroke="currentColor" strokeWidth="1.66667" strokeLinecap="round" strokeLinejoin="round"/>
-        <path d="M4.16675 12.5H3.33341C2.89139 12.5 2.46746 12.3244 2.15478 12.0118C1.84209 11.6991 1.66675 11.2751 1.66675 10.8333V3.33329C1.66675 2.89127 1.84209 2.46734 2.15478 2.15465C2.46746 1.84196 2.89139 1.66663 3.33341 1.66663H10.8334C11.2754 1.66663 11.6994 1.84196 12.0121 2.15465C12.3247 2.46734 12.5001 2.89127 12.5001 3.33329V4.16663" stroke="currentColor" strokeWidth="1.66667" strokeLinecap="round" strokeLinejoin="round"/>
-    </svg>
-);
+    )
+}
 
 export default DetailedClient
