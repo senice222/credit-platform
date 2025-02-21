@@ -1,7 +1,7 @@
 import axios from "axios";
 
-export const url = 'http://localhost:4000/api';
-// export const url = 'https://credit.consultantnlgpanel.ru/api';
+// export const url = 'http://localhost:4000/api';
+export const url = 'https://credit.consultantnlgpanel.ru/api';
 const $api = axios.create({
     baseURL: url,
     headers: {
