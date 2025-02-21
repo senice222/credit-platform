@@ -30,7 +30,7 @@ export const AddClient = ({ isOpened, setOpened }) => {
             });
 
             // Формируем ссылку для верификации
-            const botLink = `https://t.me/test182828_bot?start=${response.verificationCode}`;
+            const botLink = `https://t.me/creditconsultnlgbot?start=${response.verificationCode}`;
             setVerificationLink(botLink);
             
             mutate(`${url}/admin/getClients`);

@@ -103,7 +103,7 @@ const AddUserModal = ({ isActive, setActive, admin }) => {
                 if (response.botVerificationCode) {
                     notification.info({
                         message: "Ссылка для доступа к боту",
-                        description: `https://t.me/test182828_bot?start=${response.botVerificationCode}`,
+                        description: `https://t.me/creditconsultnlgbot?start=${response.botVerificationCode}`,
                         duration: 0
                     });
                 }
